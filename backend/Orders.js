@@ -8,14 +8,13 @@ function orderFromPayload(payload) {
 	return new Order(
 		payload.address,
 		payload.marketContractAddress,
-		payload.type,
-		payload.baseTokenAddress,
-		payload.quoteTokenAddress,
+		payload.offeredTokenAddress,
+		payload.requestedTokenAddress,
 		new BigNumber(payload.salt),
-		new BigNumber(payload.baseTokenAmount),
+		new BigNumber(payload.offeredTokenAmount),
 		new BigNumber(payload.price),
-		new BigNumber(payload.minBaseTokenAmount),
-		new BigNumber(payload.maxBaseTokenAmount),
+		new BigNumber(payload.minRequestedTokenAmount),
+		new BigNumber(payload.maxRequestedTokenAmount),
 		new BigNumber(payload.expiryTime),
 		new BigNumber(payload.matcherFee)
 	);
@@ -24,26 +23,24 @@ function orderFromPayload(payload) {
 export class Order {
 	constructor(address, // maker address
 			marketContractAddress, // market contract address
-			type, // "buy" or "sell"
-			baseTokenAddress, // base token contract address
-			quoteTokenAddress, // quote token contract address
+			offeredTokenAddress, // offer token contract address
+			requestedTokenAddress, // request token contract address
 			salt, // pseudo-random 256-bit number, as a BigNumber
-			baseTokenAmount, // amount of base token being bought / sold, as a BigNumber
-			price, // amount of quote token per base token, as a BigNumber
-			minBaseTokenAmount, // minimum amount of base token that may be taken per order, as a BigNumber
-			maxBaseTokenAmount, // maximum amount of base token that may be taken per order, as a BigNumber
+			offeredTokenAmount, // amount of token being offered, as a BigNumber
+			price, // amount of request token per order token, as a BigNumber
+			minRequestedTokenAmount, // minimum amount of request token that may be taken per order, as a BigNumber
+			maxRequestedTokenAmount, // maximum amount of request token that may be taken per order, as a BigNumber
 			expiryTime, // UNIX timestamp, seconds, as a BigNumber
 			matcherFee) { // in ETH, as a BigNumber
 		this.address = address;
 		this.marketContractAddress = marketContractAddress;
-		this.type = type;
-		this.baseTokenAddress = baseTokenAddress;
-		this.quoteTokenAddress = quoteTokenAddress;
+		this.offeredTokenAddress = offeredTokenAddress;
+		this.requestedTokenAddress = requestedTokenAddress;
 		this.salt = salt;
-		this.baseTokenAmount = baseTokenAmount;
+		this.offeredTokenAmount = offeredTokenAmount;
 		this.price = price;
-		this.minBaseTokenAmount = minBaseTokenAmount;
-		this.maxBaseTokenAmount = maxBaseTokenAmount;
+		this.minRequestedTokenAmount = minRequestedTokenAmount;
+		this.maxRequestedTokenAmount = maxRequestedTokenAmount;
 		this.expiryTime = expiryTime;
 		this.matcherFee = matcherFee;
 	}
@@ -52,14 +49,13 @@ export class Order {
 		return {
 			address: this.address,
 			marketContractAddress: this.marketContractAddress,
-			type: this.type,
-			baseTokenAddress: this.baseTokenAddress,
-			quoteTokenAddress: this.quoteTokenAddress,
+			offeredTokenAddress: this.offeredTokenAddress,
+			requestedTokenAddress: this.requestedTokenAddress,
 			salt: this.salt.toString(),
-			baseTokenAmount: this.baseTokenAmount.toString(),
+			offeredTokenAmount: this.offeredTokenAmount.toString(),
 			price: this.price.toString(),
-			minBaseTokenAmount: this.minBaseTokenAmount.toString(),
-			maxBaseTokenAmount: this.maxBaseTokenAmount.toString(),
+			minRequestedTokenAmount: this.minRequestedTokenAmount.toString(),
+			maxRequestedTokenAmount: this.maxRequestedTokenAmount.toString(),
 			expiryTime: this.expiryTime.toString(),
 			matcherFee: this.matcherFee.toString()
 		};
@@ -70,25 +66,21 @@ export class Order {
 		return hash(this.toPayload());
 	}
 
-	// Get the 0x order object, with this order as the maker
-	toZeroExOrder(baseTokenAmount, baseTokenDecimals, quoteTokenDecimals) {
+	// Get the 0x order object, with this order as the offerer
+	toZeroExOrder(offeredTokenAmount, offeredTokenDecimals, requestedTokenAddress) {
 		return {
 			maker: this.address,
 			taker: NULL_ADDRESS,
 			feeRecipient: NULL_ADDRESS,
-			makerTokenAddress: this.type == "buy" ? this.quoteTokenAddress : this.baseTokenAddress,
-			takerTokenAddress: this.type == "buy" ? this.baseTokenAddress : this.quoteTokenAddress,
+			makerTokenAddress: this.offeredTokenAddress,
+			takerTokenAddress: this.requestedTokenAddress,
 			exchangeContractAddress: this.marketContractAddress,
 			salt: this.salt,
 			makerFee: new BigNumber(0),
 			takerFee: new BigNumber(0),
-			makerTokenAmount: this.type == "buy" ?
-					ZeroEx.toBaseUnitAmount(new BigNumber(baseTokenAmount * this.price), quoteTokenDecimals).round()
-					: ZeroEx.toBaseUnitAmount(baseTokenAmount, baseTokenDecimals),
-			takerTokenAmount: this.type == "buy" ?
-					ZeroEx.toBaseUnitAmount(baseTokenAmount, baseTokenDecimals)
-					: ZeroEx.toBaseUnitAmount(new BigNumber(baseTokenAmount * this.price), quoteTokenDecimals).round(),
-			expirationUnixTimestampSec: new BigNumber(Date.now() + 3600000),
+			makerTokenAmount: ZeroEx.toBaseUnitAmount(offeredTokenAmount, offeredTokenDecimals),
+			takerTokenAmount: ZeroEx.toBaseUnitAmount(new BigNumber(offeredTokenAmount * this.price), requestedTokenAddress).round(),
+			expirationUnixTimestampSec: new BigNumber(Date.now() + 3600000)
 		};
 	}
 }
@@ -136,32 +128,27 @@ export class OrderPool {
 				return;
 			if (o.marketContractAddress != order.marketContractAddress)
 				return;
-			if (o.type == order.type)
+			if (o.offeredTokenAddress != order.requestedTokenAddress)
 				return;
-			if (o.baseTokenAddress != order.baseTokenAddress)
+			if (o.requestedTokenAddress != order.offeredTokenAddress)
 				return;
-			if (o.quoteTokenAddress != order.quoteTokenAddress)
+			if (o.offeredTokenAmount == 0 || order.offeredTokenAmount == 0)
 				return;
-			if (o.type == "buy") {
-				if (o.price < order.price)
-					return;
-			} else {
-				if (o.price > order.price)
-					return;
-			}
-			let amount = BigNumber.min(o.baseTokenAmount, order.baseTokenAmount);
-			if (amount < o.minBaseTokenAmount || amount < order.minBaseTokenAmount)
+			if (o.price > (new BigNumber(1) / order.price))
 				return;
-			if (amount > o.maxBaseTokenAmount || amount > order.maxBaseTokenAmount)
+			let offeredAmount = BigNumber.min(o.offeredTokenAmount, new BigNumber(order.offeredTokenAmount * order.price));
+			let requestedAmount = BigNumber.min(new BigNumber(o.offeredTokenAmount * o.price), order.offeredTokenAmount);
+			if (requestedAmount < o.minRequestedTokenAmount || requestedAmount > o.maxRequestedTokenAmount)
 				return;
-			if (amount == new BigNumber(0))
+			if (offeredAmount < order.minRequestedTokenAmount || offeredAmount > order.maxRequestedTokenAmount)
 				return;
 			matches.push({
 				makerOrder: order,
 				takerOrder: o,
-				amount: amount,
+				makerOfferedAmount: requestedAmount,
+				takerOfferedAmount: offeredAmount,
 				priority: [o.matcherFee + order.matcherFee, BigNumber.min(o.expiryTime, order.expiryTime),
-						Math.abs(o.price - order.price), amount],
+						Math.abs(o.price - order.price), offeredAmount],
 			});
 		});
 
@@ -178,7 +165,8 @@ export class OrderPool {
 			return {
 				makerOrder: bestMatch.makerOrder,
 				takerOrder: bestMatch.takerOrder,
-				amount: bestMatch.amount,
+				makerOfferedAmount: bestMatch.makerOfferedAmount,
+				takerOfferedAmount: bestMatch.takerOfferedAmount
 			};
 		}
 	}
