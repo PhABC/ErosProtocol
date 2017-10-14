@@ -1,0 +1,10 @@
+.portfolio {
+  background-color: #ECECEC;
+  .row {
+    margin-bottom: 55px;
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+

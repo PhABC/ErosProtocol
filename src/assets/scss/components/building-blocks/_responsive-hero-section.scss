@@ -1,0 +1,61 @@
+$hero-background-color: #F5F5F5;
+
+.hero-section {
+  background:$hero-background-color;
+  background-size: cover;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  
+  h1 {
+    margin: 90px 0 25px;
+    font-weight: 300;
+    font-size: 40px;
+  }
+  
+  h5 {
+    font-size: 24px;
+    color: $topbar-responsive-button-color;
+    font-weight: 300;
+    cursor: pointer;
+    margin-top: 25px;
+  }
+  
+  .menu {
+    
+    li {
+      margin-right: 0;
+    }
+  }
+
+
+  span {
+    &.button {
+      background-color: $topbar-responsive-button-color;
+      margin: 20px;
+    }
+  }
+
+  .hero-section-text {
+    color: #616161;
+    
+    .hero-section-img {
+      width: 404px;
+      @media screen and (max-width: 39.9375em) {
+        width: 75vw;
+      }
+    }
+    
+  }
+}
+
+[data-whatinput='mouse'] .close-button {
+  display: static;
+  font-size: 34px;
+}
+
+
+
+
+

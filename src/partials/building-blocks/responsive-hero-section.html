@@ -1,0 +1,50 @@
+<div id="home" class="hero-section">
+    <div class="hero-section-text">
+        <div style="width:60%;" class="row">
+            <div class="small-12 medium-12 columns">
+                <ul class="tabs" data-tabs id="buy-sell-tabs">
+                    <li class="tabs-title is-active"><a href="#buy" aria-selected="true">Buy</a></li>
+                    <li class="tabs-title"><a href="#sell">Sell</a></li>
+                </ul>
+                <div class="tabs-content eros" data-tabs-content="buy-sell-tabs">
+                    <div class="tabs-panel is-active" id="buy">
+                        <div class="input-group">
+                            <span class="input-group-label">ETH</span>
+                            <input autofocus class="input-group-field" step=".1" min="0" placeholder="Amount to buy" type="number">
+                        </div>
+
+                        <div class="input-group">
+                            <span class="input-group-label">SAI</span>
+                            <input class="input-group-field" step=".1" min="0" placeholder="Price to pay" type="number">
+                        </div>
+
+                        <div class="input-group">
+                            <span style="border-color: #999" class="input-group-label">Lifespan</span>
+                            <input class="input-group-field" step=".1" min="0" placeholder="in minutes" type="number">
+                        </div>
+                        
+                        <input type="submit" width="100%" class="button expanded" value="Broadcast">
+                    </div>
+                    <div class="tabs-panel" id="sell">
+                        <div class="input-group">
+                            <span class="input-group-label">ETH</span>
+                            <input autofocus class="input-group-field" step=".1" min="0" placeholder="Amount to sell" type="number">
+                        </div>
+
+                        <div class="input-group">
+                            <span class="input-group-label">SAI</span>
+                            <input class="input-group-field" step=".1" min="0" placeholder="Price to pay" type="number">
+                        </div>
+
+                        <div class="input-group">
+                            <span style="border-color: #999" class="input-group-label">Lifespan</span>
+                            <input class="input-group-field" step=".1" min="0" placeholder="in minutes" type="number">
+                        </div>
+
+                        <input type="submit" width="100%" class="button expanded round" value="Broadcast">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
