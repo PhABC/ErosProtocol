@@ -1,0 +1,84 @@
+const Web3 = require('web3');
+const web3 = new Web3('ws://localhost:8546');
+//const Shh = require('web3-shh');
+const shh = web3.shh;
+
+let activeModules = [web3.utils.asciiToHex('golem').slice(0,10), web3.utils.asciiToHex('maker').slice(0,10)];
+
+let data = {};
+
+//let data = "hello";
+
+//web3.eth.sign(data,
+
+
+
+const setup1 = () => {
+	return shh.newKeyPair()
+	.then(id => {
+		data.asymKeyId1 = id;
+		return shh.getPublicKey(id)
+		.then(pubKey => {
+			data.asymPubKey = pubKey;
+			return shh.newSymKey()
+		})
+		.then(symKeyId => {
+			data.symKeyId = symKeyId;
+		}).catch(console.log)
+	}).catch(console.log)
+};
+
+const setup2 = () => {
+	return shh.newKeyPair()
+	.then(id => {
+		console.log('key2', id);
+		data.asymKeyId2 = id;
+		return Promise.all([shh.getPublicKey(id), shh.getPrivateKey(id)])
+		.then(values => {
+			data.pubKey2 = values[0];
+			data.privKey2 = values[1];
+		}).catch(console.log)
+	}).catch(console.log)
+};
+
+
+
+const initListeners = () => {
+	shh.subscribe('messages', {
+	    topics: [activeModules[0]],
+			symKeyId: data.symKeyId
+	}, (err, obj) => {
+		if(err) throw new Error(err);
+		console.log('listening');
+		console.log(obj);
+	  let decodedPayload = JSON.parse(web3.utils.toAscii(obj.payload));
+	 	console.log(decodedPayload);
+
+		console.log(data);
+		// var ret = {}
+		// var signature = obj.sig;
+		// r = signature.slice(0, 66);
+		// s = '0x' + signature.slice(66, 130);
+		// v = '0x' + signature.slice(130, 132);
+		// v = web3.utils.toDecimal(v);
+		//console.log(r, s, v);
+		console.log(web3.eth.accounts.recover(obj.hash, obj.signature));
+	});
+};
+
+let payload = {test:"test2"};
+setup1()
+.then(setup2())
+.then(() => {
+	initListeners();
+	console.log(data);
+	shh.post({
+		symKeyId: data.symKeyId,
+		ttl: 7,
+		topic: activeModules[0],
+		powTarget: 2.01,
+		powTime: 2,
+		sig: data.asymKeyId2,
+		payload: web3.utils.toHex(JSON.stringify(payload)),
+	});
+});
