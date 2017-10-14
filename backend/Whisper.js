@@ -11,8 +11,6 @@ let data = {};
 
 //web3.eth.sign(data,
 
-
-
 const setup1 = () => {
 	return shh.newKeyPair()
 	.then(id => {
@@ -41,44 +39,42 @@ const setup2 = () => {
 	}).catch(console.log)
 };
 
-
-
 const initListeners = () => {
 	shh.subscribe('messages', {
 	    topics: [activeModules[0]],
 			symKeyId: data.symKeyId
 	}, (err, obj) => {
-		if(err) throw new Error(err);
-			console.log(obj);
-			console.log(JSON.parse(web3.utils.hexToAscii(obj.payload)));
+		if (err) throw new Error(err);
+		onReceivePayload(JSON.parse(web3.utils.hexToAscii(obj.payload)));
+	});
+};
+
+export const sendPayload = (payload) => {
+	setup1()
+	.then(setup2())
+	.then(() => {
+		initListeners();
+
+		web3.eth.sign(JSON.stringify(payload),'046Eb57F232e2262059F168Cf098B087d75195Dd')
+		.then(sig => {
+			payload = {
+				...payload,
+				sig
+			};
+			shh.post({
+				symKeyId: data.symKeyId,
+				ttl: 7,
+				topic: activeModules[0],
+				powTarget: 2.01,
+				powTime: 2,
+				payload: web3.utils.toHex(payload),
+				sig: data.asymKeyId2,
+			});
+		})
 
 	});
 };
 
-let payload = {test:"test2"};
-
-
-
-setup1()
-.then(setup2())
-.then(() => {
-	initListeners();
-
-	web3.eth.sign(JSON.stringify(payload),'046Eb57F232e2262059F168Cf098B087d75195Dd')
-	.then(sig => {
-		payload = {
-			...payload,
-			sig
-		};
-		shh.post({
-			symKeyId: data.symKeyId,
-			ttl: 7,
-			topic: activeModules[0],
-			powTarget: 2.01,
-			powTime: 2,
-			payload: web3.utils.toHex(payload),
-			sig: data.asymKeyId2,
-		});
-	})
-
-});¡
+const onReceivePayload = (payload) => {
+	console.log(payload);
+};

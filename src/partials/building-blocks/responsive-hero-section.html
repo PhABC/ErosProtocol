@@ -70,10 +70,20 @@
 </div>
 
 
-<div class="reveal" id="exampleModal1" data-reveal>
-    <h1>Awesome. I Have It.</h1>
-    <p class="lead">Your couch. It is mine.</p>
-    <p>I'm a cool paragraph that lives inside of an even cooler modal. Wins!</p>
+<div style="display:flex;justify-content: center; flex-direction: column; " class="reveal" id="exampleModal1" data-reveal>
+    <h1 style="text-align: center;">Awesome. <br>It's whispering.</h1>
+    <img style="margin:0 auto;" src="assets/img/spinner.gif">
+    <p style="color: forestgreen; text-align: center;">Propagating order, please stand by.</p>
+    <div data-open="exampleModal2" class="button">fake order completion.</div>
+    <button class="close-button" data-close aria-label="Close modal" type="button">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+
+<div style="display:flex;justify-content: center; flex-direction: column;" class="reveal" id="exampleModal2" data-reveal>
+    <h1 style="text-align: center;">Done. Ready. Voilá.</h1>
+    <p style="color: forestgreen; text-align: center;">Your order is now fulfilled.</p>
+    <div data-close aria-label="Close modal" class="button expanded">Close</div>
     <button class="close-button" data-close aria-label="Close modal" type="button">
         <span aria-hidden="true">&times;</span>
     </button>

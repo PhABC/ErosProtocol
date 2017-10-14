@@ -1,11 +1,13 @@
 const BigNumber = require("bignumber.js");
 const hash = require("object-hash")
+const ZeroEx = require('0x.js').ZeroEx;
 
 const NULL_ADDRESS = "0x0000000000000000000000000000000000000000";
 
 function orderFromPayload(payload) {
 	return new Order(
 		payload.address,
+		payload.marketContractAddress,
 		payload.type,
 		payload.baseTokenAddress,
 		payload.quoteTokenAddress,
@@ -21,6 +23,7 @@ function orderFromPayload(payload) {
 
 export class Order {
 	constructor(address, // maker address
+			marketContractAddress, // market contract address
 			type, // "buy" or "sell"
 			baseTokenAddress, // base token contract address
 			quoteTokenAddress, // quote token contract address
@@ -32,6 +35,7 @@ export class Order {
 			expiryTime, // UNIX timestamp, seconds, as a BigNumber
 			matcherFee) { // in ETH, as a BigNumber
 		this.address = address;
+		this.marketContractAddress = marketContractAddress;
 		this.type = type;
 		this.baseTokenAddress = baseTokenAddress;
 		this.quoteTokenAddress = quoteTokenAddress;
@@ -47,6 +51,7 @@ export class Order {
 	toPayload() {
 		return {
 			address: this.address,
+			marketContractAddress: this.marketContractAddress,
 			type: this.type,
 			baseTokenAddress: this.baseTokenAddress,
 			quoteTokenAddress: this.quoteTokenAddress,
@@ -65,23 +70,27 @@ export class Order {
 		return hash(this.toPayload());
 	}
 
-	// // Get the 0x order object, with this order as the maker
-	// toZeroExOrder(baseTokenAmount) {
-	// 	return {
-	// 		maker: this.address,
-	// 		taker: NULL_ADDRESS,
-	// 		feeRecipient: NULL_ADDRESS,
-	// 		makerTokenAddress: this.type == "buy" ? this.quoteTokenAddress : this.baseTokenAddress,
-	// 		takerTokenAddress: this.type == "buy" ? this.baseTokenAddress : this.quoteTokenAddress,
-	// 		exchangeContractAddress: EXCHANGE_ADDRESS,
-	// 		salt: this.salt,
-	// 		makerFee: new BigNumber(0),
-	// 		takerFee: new BigNumber(0),
-	// 		makerTokenAmount: this.type == "buy" ? (baseTokenAmount * this.price) : baseTokenAmount, // TODO: Round and convert to base units
-	// 		takerTokenAmount: this.type == "buy" ? baseTokenAmount : (baseTokenAmount * this.price), // TODO: Round and convert to base units
-	// 		expirationUnixTimestampSec: new BigNumber(Date.now() + 3600000),
-	// 	};
-	// }
+	// Get the 0x order object, with this order as the maker
+	toZeroExOrder(baseTokenAmount, baseTokenDecimals, quoteTokenDecimals) {
+		return {
+			maker: this.address,
+			taker: NULL_ADDRESS,
+			feeRecipient: NULL_ADDRESS,
+			makerTokenAddress: this.type == "buy" ? this.quoteTokenAddress : this.baseTokenAddress,
+			takerTokenAddress: this.type == "buy" ? this.baseTokenAddress : this.quoteTokenAddress,
+			exchangeContractAddress: this.marketContractAddress,
+			salt: this.salt,
+			makerFee: new BigNumber(0),
+			takerFee: new BigNumber(0),
+			makerTokenAmount: this.type == "buy" ?
+					ZeroEx.toBaseUnitAmount(new BigNumber(baseTokenAmount * this.price), quoteTokenDecimals).round()
+					: ZeroEx.toBaseUnitAmount(baseTokenAmount, baseTokenDecimals),
+			takerTokenAmount: this.type == "buy" ?
+					ZeroEx.toBaseUnitAmount(baseTokenAmount, baseTokenDecimals)
+					: ZeroEx.toBaseUnitAmount(new BigNumber(baseTokenAmount * this.price), quoteTokenDecimals).round(),
+			expirationUnixTimestampSec: new BigNumber(Date.now() + 3600000),
+		};
+	}
 }
 
 export class OrderPool {
@@ -125,6 +134,8 @@ export class OrderPool {
 		this.pool.forEach((o) => {
 			if (o.id == order.id)
 				return;
+			if (o.marketContractAddress != order.marketContractAddress)
+				return;
 			if (o.type == order.type)
 				return;
 			if (o.baseTokenAddress != order.baseTokenAddress)
@@ -143,7 +154,7 @@ export class OrderPool {
 				return;
 			if (amount > o.maxBaseTokenAmount || amount > order.maxBaseTokenAmount)
 				return;
-			if (amount == 0)
+			if (amount == new BigNumber(0))
 				return;
 			matches.push({
 				makerOrder: order,
