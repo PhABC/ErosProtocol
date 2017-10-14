@@ -16,7 +16,6 @@ $hero-background-color: #F5F5F5;
   
   h5 {
     font-size: 24px;
-    color: $topbar-responsive-button-color;
     font-weight: 300;
     cursor: pointer;
     margin-top: 25px;
@@ -32,7 +31,7 @@ $hero-background-color: #F5F5F5;
 
   span {
     &.button {
-      background-color: $topbar-responsive-button-color;
+      background-color:#2A74ED;
       margin: 20px;
     }
   }
