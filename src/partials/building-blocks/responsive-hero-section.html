@@ -2,6 +2,8 @@
     <div class="hero-section-text">
         <div style="width:60%;" class="row">
             <div class="small-12 medium-12 columns">
+                <a style="color:#616161;font-size:18px;zoom: 545%;opacity: 0.07;" class="topbar-responsive-logo" href="#">ER<span style="color:red;font-size:20px;">&#x25CF;</span>S &nbsp; Pr<span style="color:red;font-size:20px;">&#x25CF;</span>t<span style="color:red;font-size:20px;">&#x25CF;</span>col</a>
+
                 <ul class="tabs" data-tabs id="buy-sell-tabs">
                     <li class="tabs-title is-active"><a href="#buy" aria-selected="true">Buy</a></li>
                     <li class="tabs-title"><a href="#sell">Sell</a></li>
@@ -10,41 +12,71 @@
                     <div class="tabs-panel is-active" id="buy">
                         <div class="input-group">
                             <span class="input-group-label">ETH</span>
-                            <input autofocus class="input-group-field" step=".1" min="0" placeholder="Amount to buy" type="number">
+                            <input id="amountBuy" autofocus class="input-group-field" step=".1" min="0" placeholder="Amount to buy" type="number">
                         </div>
 
                         <div class="input-group">
                             <span class="input-group-label">SAI</span>
-                            <input class="input-group-field" step=".1" min="0" placeholder="Price to pay" type="number">
+                            <input id="price" class="input-group-field" step=".1" min="0" placeholder="Price to pay" type="number">
                         </div>
-
-                        <div class="input-group">
-                            <span style="border-color: #999" class="input-group-label">Lifespan</span>
-                            <input class="input-group-field" step=".1" min="0" placeholder="in minutes" type="number">
+                        <div class="row">
+                            <div class="small-12 medium-6 columns">
+                                <div class="input-group"  style="margin-right:0">
+                                    <span style="border-color: #999" class="input-group-label">Lifespan</span>
+                                    <input id="ttl" class="input-group-field" step=".1" min="0" placeholder="in minutes" type="number">
+                                </div>
+                            </div>
+                            <div class="small-12 medium-6 columns">
+                                <div class="input-group"  style="margin-left:0">
+                                    <span style="border-color: #999" class="input-group-label">Fee</span>
+                                    <input id="feeBuy" class="input-group-field" step=".1" min="0" placeholder="max fee" type="number">
+                                </div>
+                            </div>
                         </div>
                         
-                        <input id="broadcastBuy" type="submit" width="100%" class="button expanded" value="Broadcast">
+                        <input id="broadcastBuy" data-open="exampleModal1" type="submit" width="100%" class="button expanded" value="Broadcast">
                     </div>
                     <div class="tabs-panel" id="sell">
                         <div class="input-group">
                             <span class="input-group-label">ETH</span>
-                            <input autofocus class="input-group-field" step=".1" min="0" placeholder="Amount to sell" type="number">
+                            <input id="amountSell" autofocus class="input-group-field" step=".1" min="0" placeholder="Amount to sell" type="number">
                         </div>
 
                         <div class="input-group">
                             <span class="input-group-label">SAI</span>
-                            <input class="input-group-field" step=".1" min="0" placeholder="Price to pay" type="number">
+                            <input id="pricePay" class="input-group-field" step=".1" min="0" placeholder="Price to pay" type="number">
                         </div>
 
-                        <div class="input-group">
-                            <span style="border-color: #999" class="input-group-label">Lifespan</span>
-                            <input class="input-group-field" step=".1" min="0" placeholder="in minutes" type="number">
+                        <div class="row">
+                            <div class="small-12 medium-6 columns">
+                                <div class="input-group" style="margin-right:0">
+                                    <span style="border-color: #999" class="input-group-label">Lifespan</span>
+                                    <input id="ttl2" class="input-group-field" step=".1" min="0" placeholder="in minutes" type="number">
+                                </div>
+                            </div>
+                            <div class="small-12 medium-6 columns">
+                                <div class="input-group" style="margin-left:0">
+                                    <span style="border-color: #999" class="input-group-label">Fee</span>
+                                    <input id="feeSell" class="input-group-field" step=".1" min="0" placeholder="max fee" type="number">
+                                </div>
+                            </div>
                         </div>
+                        
 
-                        <input type="submit" width="100%" class="button expanded round" value="Broadcast">
+                        <input id="broadcastSell" type="submit" width="100%" class="button expanded round" value="Broadcast">
                     </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
+
+
+<div class="reveal" id="exampleModal1" data-reveal>
+    <h1>Awesome. I Have It.</h1>
+    <p class="lead">Your couch. It is mine.</p>
+    <p>I'm a cool paragraph that lives inside of an even cooler modal. Wins!</p>
+    <button class="close-button" data-close aria-label="Close modal" type="button">
+        <span aria-hidden="true">&times;</span>
+    </button>
 </div>

@@ -52,26 +52,20 @@
 @include motion-ui-transitions;
 @include motion-ui-animations;
 
-@import 'components/building-blocks/featured-testimonials';
-@import 'components/building-blocks/portfolio';
+
 @import 'components/building-blocks/topbar-responsive';
 @import 'components/building-blocks/social-footer';
 @import 'components/building-blocks/responsive-hero-section';
-@import 'components/building-blocks/marketing-site-three-up';
-@import 'components/building-blocks/marketing-site-features';
-
-@import 'components/building-blocks/login-box';
-@import 'components/building-blocks/marketing-site-hero';
 
 #home {
   .hero-section-text {
     height: 100%;
-    margin-top:80px;
+    margin-top:0;
     .tabs {
       border-radius: 0 15px 0 0;
       .tabs-title > a {
         display: block;
-        padding: 1.25rem 4rem;
+        padding: 1.25rem 10rem;
         color: #2A74ED;
       }
     }
@@ -106,7 +100,6 @@
     }
   }
 }
-
 
 
 body,html {height: 100%;}
