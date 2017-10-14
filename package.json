@@ -1,7 +1,7 @@
 {
-  "name": "foundation-zurb-template",
+  "name": "Eros Protocol",
   "version": "1.0.0",
-  "description": "Official ZURB Template for Foundation for Sites.",
+  "description": "Eros Protocol PoC for ETHwaterloo",
   "main": "gulpfile.js",
   "scripts": {
     "start": "gulp",
