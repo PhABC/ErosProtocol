@@ -4,7 +4,8 @@ const ZeroEx = require('0x.js').ZeroEx;
 
 const NULL_ADDRESS = "0x0000000000000000000000000000000000000000";
 
-function orderFromPayload(payload) {
+export function orderFromPayload(payload) {
+	console.log(payload);
 	return new Order(
 		payload.address,
 		payload.marketContractAddress,

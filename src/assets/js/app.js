@@ -1,8 +1,12 @@
 const ethUtil = require('ethereumjs-util');
+const BigNumber = require("bignumber.js");
 const web3Util = require('web3-utils');
-
-
+const ZeroEx = require('0x.js').ZeroEx;
+const DECIMALS = 16;
+const NULL_ADDRESS = "0x0000000000000000000000000000000000000000";
+const ZRX_ADDRESS = "0x123";
 var identities = {};
+
 const whisperSetup = function () {
 
   web3.shh.newSymKey((err, sym) => {
@@ -33,11 +37,19 @@ const sendWhisper = function(identities, payload) {
 
 
 window.submitBuy = function() {
+
   var obj = {
-      amountBuy: $("#amountBuy").val(),
-      price: $("#price").val(),
-      ttl: $("#ttl").val(),
-      feeBuy: $("#feeBuy").val()
+      maker: web3.eth.accounts[0],
+      taker: NULL_ADDRESS,
+      salt: ZeroEx.toBaseUnitAmount(new BigNumber(0.2), DECIMALS),
+      minRequestedTokenAmount: ZeroEx.toBaseUnitAmount(new BigNumber(0.2), DECIMALS),
+      requestedTokenAddress: '0x123',
+      offeredTokenAddress: '0x1234',
+      marketContractAddress: '0x125',
+      offeredTokenAmount: ZeroEx.toBaseUnitAmount(new BigNumber($("#amountBuy").val()), DECIMALS),
+      price: ZeroEx.toBaseUnitAmount(new BigNumber($("#price").val()), DECIMALS),
+      expiryTime: ZeroEx.toBaseUnitAmount(new BigNumber($("#ttl").val()), DECIMALS),
+      matcherFee: ZeroEx.toBaseUnitAmount(new BigNumber($("#feeBuy").val()), DECIMALS)
   }
 
 

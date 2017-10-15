@@ -1,8 +1,11 @@
 const Web3 = require('web3');
 const web3 = new Web3('ws://localhost:8546');
-//const Shh = require('web3-shh');
+const ZeroEx = require('0x.js').ZeroEx;
+const BigNumber = require("bignumber.js");
+const DECIMALS = 16;
+const NULL_ADDRESS = "0x0000000000000000000000000000000000000000";
+const ZRX_ADDRESS = "0x123";
 const shh = web3.shh;
-
 let activeModules = [web3.utils.asciiToHex('golem').slice(0,10), web3.utils.asciiToHex('maker').slice(0,10)];
 console.log(activeModules);
 var data = {};
@@ -17,7 +20,7 @@ const setup1 = () => {
 		return shh.getPublicKey(id)
 		.then(pubKey => {
 			data.asymPubKey = pubKey;
-			return shh.newSymKey();
+			return shh.generateSymKeyFromPassword("eros");
 		})
 		.then(symKeyId => {
 			data.symKeyId = symKeyId;
@@ -41,14 +44,14 @@ const setup2 = () => {
 const initListeners = () => {
 	shh.subscribe('messages', {
 	    topics: [activeModules[0]],
-			symKeyId: "c1496cd0731bab44a6c389ef146eb891b5df6e1708058b484966b484847a8fc6"
+			symKeyId: data.symKeyId
 	}, (err, obj) => {
 		if (err) throw new Error(err);
 		onReceivePayload(JSON.parse(web3.utils.hexToAscii(obj.payload)));
 	});
 };
 
- const sendPayload = (payload) => {
+ export const sendPayload = (payload) => {
 	setup1()
 	.then(setup2())
 	.then(() => {
@@ -61,7 +64,7 @@ const initListeners = () => {
 			};
 			console.log(data);
 			shh.post({
-				symKeyId: "c1496cd0731bab44a6c389ef146eb891b5df6e1708058b484966b484847a8fc6",
+				symKeyId: data.symKeyId,
 				ttl: 7,
 				topic: activeModules[0],
 				powTarget: 2.01,
@@ -84,13 +87,21 @@ export const addOnReceivePayload = (callback) => {
 };
 
 const onReceivePayload = (payload) => {
-<<<<<<< HEAD
-	console.log(payload);
-	console.log('est');
-=======
 	onReceivePayloadCallbacks.forEach((callback) => { callback(payload); })
->>>>>>> 4e412ffb12d3c2dcbe80b4899ec1793047dc240f
 };
 
 
-sendPayload('test');
+sendPayload({
+	maker: web3.eth.accounts[0],
+	taker: NULL_ADDRESS,
+	salt: ZeroEx.toBaseUnitAmount(new BigNumber(0.2), DECIMALS),
+	minRequestedTokenAmount: ZeroEx.toBaseUnitAmount(new BigNumber(0.2), DECIMALS),
+	maxRequestedTokenAmount: ZeroEx.toBaseUnitAmount(new BigNumber(0.2), DECIMALS),
+	requestedTokenAddress: '0x123',
+	offeredTokenAddress: '0x1234',
+	marketContractAddress: '0x125',
+	offeredTokenAmount: ZeroEx.toBaseUnitAmount(new BigNumber(0.2), DECIMALS),
+	price: ZeroEx.toBaseUnitAmount(new BigNumber(0.2), DECIMALS),
+	expiryTime: ZeroEx.toBaseUnitAmount(new BigNumber(0.2), DECIMALS),
+	matcherFee: ZeroEx.toBaseUnitAmount(new BigNumber(0.2), DECIMALS)
+});
