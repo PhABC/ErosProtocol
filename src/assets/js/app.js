@@ -13,11 +13,11 @@ let EROS_CONTRACT_ADDRESS;
 
 let erosContract;
 
-$.getJSON("ErosDiscoveryProtocol.json", (json) => {
+$.getJSON("/assets/ErosDiscoveryProtocol.json", (json) => {
     EROS_CONTRACT_ABI = json;
     EROS_CONTRACT_ADDRESS = '0x0123'; // TODO
 
-    erosContract = web3.eth.Contract(EROS_CONTRACT_ABI, EROS_CONTRACT_ADDRESS);
+    erosContract = web3.eth.contract(EROS_CONTRACT_ABI.abi);
 
     let abi;
     EROS_CONTRACT_ABI.abi.forEach((obj) => {
@@ -28,12 +28,8 @@ $.getJSON("ErosDiscoveryProtocol.json", (json) => {
 });
 
 const whisperSetup = function () {
-
-  web3.shh.newSymKey((err, sym) => {
+  return web3.shh.generateSymKeyFromPassword("eros", (err, sym) => {
     identities['sym'] = sym;
-    web3.shh.newKeyPair((err, asym) => {
-      identities['asym'] = asym;
-    });
   })
 };
 
@@ -55,27 +51,27 @@ const sendWhisper = function(identities, payload) {
     });
 };
 
-erosContract.events.MatchedEvent({}, (error, event) => {
-    if (error)
-        throw new Error(error);
-    txHash = event.transactionHash;
-    web3.eth.getTransaction(txHash).then((tx) => {
-        let input = tx.input;
-        let inputDecoded = abiDecoder.decodeMethod(input);
-        let orderA = {};
-        { orderA.maker, orderA.taker, orderA.feeRecipient, orderA.makerTokenAddress,
-                orderA.takerTokenAddress } = inputDecoded.params[0].value;
-        { orderA.salt, orderA.makerFee, orderA.takerFee, orderA.makerTokenAmount, orderA.takerTokenAmount,
-                orderA.expirationUnixTimestampSec } = inputDecoded.params[1].value;
-        orderA.ecSignature = [inputDecoded.params[4], inputDecoded.params[3], inputDecoded.params[2]];
-        let orderB = {};
-        { orderB.maker, orderB.taker, orderB.feeRecipient, orderB.makerTokenAddress,
-                orderB.takerTokenAddress } = inputDecoded.params[5].value;
-        { orderB.salt, orderB.makerFee, orderB.takerFee, orderB.makerTokenAmount, orderB.takerTokenAmount,
-                orderB.expirationUnixTimestampSec } = inputDecoded.params[6].value;
-        orderB.ecSignature = [inputDecoded.params[9], inputDecoded.params[8], inputDecoded.params[7]];
-    });
-});
+// erosContract.events.MatchedEvent({}, (error, event) => {
+//     if (error)
+//         throw new Error(error);
+//     txHash = event.transactionHash;
+//     web3.eth.getTransaction(txHash).then((tx) => {
+//         let input = tx.input;
+//         let inputDecoded = abiDecoder.decodeMethod(input);
+//         let orderA = {};
+//         { orderA.maker, orderA.taker, orderA.feeRecipient, orderA.makerTokenAddress,
+//                 orderA.takerTokenAddress } = inputDecoded.params[0].value;
+//         { orderA.salt, orderA.makerFee, orderA.takerFee, orderA.makerTokenAmount, orderA.takerTokenAmount,
+//                 orderA.expirationUnixTimestampSec } = inputDecoded.params[1].value;
+//         orderA.ecSignature = [inputDecoded.params[4], inputDecoded.params[3], inputDecoded.params[2]];
+//         let orderB = {};
+//         { orderB.maker, orderB.taker, orderB.feeRecipient, orderB.makerTokenAddress,
+//                 orderB.takerTokenAddress } = inputDecoded.params[5].value;
+//         { orderB.salt, orderB.makerFee, orderB.takerFee, orderB.makerTokenAmount, orderB.takerTokenAmount,
+//                 orderB.expirationUnixTimestampSec } = inputDecoded.params[6].value;
+//         orderB.ecSignature = [inputDecoded.params[9], inputDecoded.params[8], inputDecoded.params[7]];
+//     });
+// });
 
 window.submitBuy = function() {
 

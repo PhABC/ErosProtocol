@@ -329,7 +329,7 @@ contract ErosDiscoveryProtocol is SafeMath {
             						v, r, s  );
     }
 
-    function getOrderHash(address[5] orderAddresses, uint[6] orderValues)
+    function getOrderHash(address[6] orderAddresses, uint[6] orderValues)
         public
         constant
         returns (bytes32)
@@ -354,18 +354,16 @@ contract ErosDiscoveryProtocol is SafeMath {
     uint o2price;
 
 
-    function settleMatchProposal( address[5] orderAddresses1,
+    function settleMatchProposal( address[6] orderAddresses1,
 						           uint[6] orderValues1,
 						           uint8 v1,
 						           bytes32 r1,
 						           bytes32 s1,
-						           address[5] orderAddresses2,
+						           address[6] orderAddresses2,
 						           uint[6] orderValues2,
 						           uint8 v2,
 						           bytes32 r2,
 						           bytes32 s2 ) public constant returns (bool success){
-						           
-						           
 
     	Order memory o1 = Order({
 						          expirationTimestampInSec: orderValues1[4],
@@ -404,6 +402,9 @@ contract ErosDiscoveryProtocol is SafeMath {
 
     	// Make sure there is an overlap in price
     	require(o1price > o2price);
+
+    	// Same smart contract
+    	require(orderAddresses1[5] == orderAddresses2[5]);
 
     	// Giving permission to Matcher from taking bounties
     	canClaimBounty[orderAddresses1[0]] = msg.sender;

@@ -1407,6 +1407,13 @@
     "src": "0:953:2"
   },
   "networks": {
+    "50": {
+      "events": {},
+      "links": {
+        "ConvertLib": "0x6000eca38b8b5bba64986182fe2a69c57f6b5414"
+      },
+      "address": "0x32eecaf51dfea9618e9bc94e9fbfddb1bbdcba15"
+    },
     "1508023759437": {
       "events": {},
       "links": {
@@ -1416,5 +1423,5 @@
     }
   },
   "schemaVersion": "1.0.0",
-  "updatedAt": "2017-10-15T08:05:50.756Z"
+  "updatedAt": "2017-10-15T10:19:13.040Z"
 }

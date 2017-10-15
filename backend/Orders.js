@@ -115,20 +115,20 @@ export class OrderPool {
 		let matches = [];
 
 		this.pool.forEach((o) => {
-			// if (o.id == order.id)
-			// 	return;
-			// if (o.exchangeContractAddress != order.exchangeContractAddress)
-			// 	return;
-			// if (o.makerTokenAddress != order.takerTokenAddress)
-			// 	return;
-			// if (o.takerTokenAddress != order.makerTokenAddress)
-			// 	return;
-			// if (o.makerTokenAmount == 0 || o.takerTokenAmount == 0)
-			// 	return;
-			// if (order.makerTokenAmount == 0 || order.takerTokenAmount == 0)
-			// 	return;
-			// if (o.takerTokenAmount / o.makerTokenAmount < order.makerTokenAmount / order.takerTokenAmount)
-			// 	return;
+			if (o.id == order.id)
+				return;
+			if (o.exchangeContractAddress != order.exchangeContractAddress)
+				return;
+			if (o.makerTokenAddress != order.takerTokenAddress)
+				return;
+			if (o.takerTokenAddress != order.makerTokenAddress)
+				return;
+			if (o.makerTokenAmount == 0 || o.takerTokenAmount == 0)
+				return;
+			if (order.makerTokenAmount == 0 || order.takerTokenAmount == 0)
+				return;
+			if (o.takerTokenAmount / o.makerTokenAmount < order.makerTokenAmount / order.takerTokenAmount)
+				return;
 			matches.push({
 				orderA: order,
 				orderB: o,
