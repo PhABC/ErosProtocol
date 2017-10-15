@@ -264,7 +264,7 @@
     "50": {
       "events": {},
       "links": {},
-      "address": "0x0d8b0dd11f5d34ed41d556def5f841900d5b1c6b"
+      "address": "0xf96b018e8de3a229dbaced8439df9e3034e263c1"
     },
     "1508023759437": {
       "events": {},
@@ -273,5 +273,5 @@
     }
   },
   "schemaVersion": "1.0.0",
-  "updatedAt": "2017-10-15T11:26:24.168Z"
+  "updatedAt": "2017-10-15T11:32:15.898Z"
 }

@@ -271,7 +271,7 @@ contract ErosDiscoveryProtocol is SafeMath {
 
 
 	// Withdrwa ETH from bounty
-	function bountyWithdrawEther(uint _value) public bountyWithdrawAllowed returns (bool success) {
+	function bountyWithdrawEther(uint _value) public returns (bool success) {
 		require(_value > 0);
 	    require(bounties[0][msg.sender] >= _value);
 
@@ -284,7 +284,7 @@ contract ErosDiscoveryProtocol is SafeMath {
 	}
 
 	// Withdraw tokens from bounty
-	function bountyWithdrawToken(address _token, uint _value) public bountyWithdrawAllowed returns (bool success) {
+	function bountyWithdrawToken(address _token, uint _value) public returns (bool success) {
 	    require(_token != 0);
 	    require(_value > 0);
 	    require(bounties[_token][msg.sender] >= _value);
