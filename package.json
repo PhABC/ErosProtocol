@@ -3,14 +3,15 @@
   "version": "1.0.0",
   "description": "Eros Protocol PoC for ETHwaterloo",
   "main": "gulpfile.js",
-  "directories":{
+  "directories": {
     "build": "build"
   },
   "scripts": {
     "start": "gulp",
     "build": "gulp build --production",
     "build2": "babel --presets es2017 --plugins transform-async-to-generator --plugins transform-es2015-modules-commonjs --plugins babel-plugin-transform-object-rest-spread backend --out-dir build",
-    "whisper": "geth --datadir geth_dev --dev --ws --wsport 8546 --shh",
+    "matcher": "node build/Matcher.js",
+    "whisper": "geth --dev --ws --wsport 8546 --wsorigins=“*” --shh",
     "testrpc": "testrpc --networkId 50 -p 8545 --db ./0x_testrpc_snapshot -m \"concert load couple harbor equip island argue ramp clarify fence smart topic\""
   },
   "author": "ZURB <foundation@zurb.com>",
@@ -56,5 +57,11 @@
       "es2015"
     ]
   },
-  "private": true
+  "private": true,
+  "dependencies": {
+    "0x.js": "^0.21.4",
+    "bignumber.js": "^4.1.0",
+    "object-hash": "^1.2.0",
+    "web3": "^1.0.0-beta.23"
+  }
 }
