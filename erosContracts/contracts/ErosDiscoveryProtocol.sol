@@ -205,7 +205,7 @@ contract ErosDiscoveryProtocol is SafeMath {
 
 	// uint8 boundPenality = 50; // Percentage of bound lost when infractiong happen
 
-	function ErosJuridistiction() {
+	function ErosDiscoveryProtocol() {
 		owner = msg.sender;
 	}
 
