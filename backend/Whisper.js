@@ -7,7 +7,6 @@ const NULL_ADDRESS = "0x0000000000000000000000000000000000000000";
 const ZRX_ADDRESS = "0x123";
 const shh = web3.shh;
 let activeModules = [web3.utils.asciiToHex('golem').slice(0,10), web3.utils.asciiToHex('maker').slice(0,10)];
-console.log(activeModules);
 var data = {};
 
 //let data = "hello";

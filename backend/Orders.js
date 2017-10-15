@@ -126,7 +126,7 @@ export class OrderPool {
 				return;
 			if (order.makerTokenAmount == 0 || order.takerTokenAmount == 0)
 				return;
-			if (o.takerTokenAmount / o.makerTokenAmount <= order.makerTokenAmount / order.takerTokenAmount)
+			if (o.takerTokenAmount / o.makerTokenAmount < order.makerTokenAmount / order.takerTokenAmount)
 				return;
 			matches.push({
 				orderA: order,
