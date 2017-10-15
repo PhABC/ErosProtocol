@@ -17,12 +17,12 @@ const setup1 = () => {
 		return shh.getPublicKey(id)
 		.then(pubKey => {
 			data.asymPubKey = pubKey;
-			return shh.newSymKey()
+			return shh.newSymKey();
 		})
 		.then(symKeyId => {
 			data.symKeyId = symKeyId;
-		}).catch(console.log)
-	}).catch(console.log)
+		}).catch(console.log);
+	}).catch(console.log);
 };
 
 const setup2 = () => {
@@ -34,8 +34,8 @@ const setup2 = () => {
 		.then(values => {
 			data.pubKey2 = values[0];
 			data.privKey2 = values[1];
-		}).catch(console.log)
-	}).catch(console.log)
+		}).catch(console.log);
+	}).catch(console.log);
 };
 
 const initListeners = () => {
@@ -77,9 +77,19 @@ const initListeners = () => {
 	});
 };
 
+const onReceivePayloadCallbacks = [];
+
+export const addOnReceivePayload = (callback) => {
+	onReceivePayloadCallbacks.push(callback);
+};
+
 const onReceivePayload = (payload) => {
+<<<<<<< HEAD
 	console.log(payload);
 	console.log('est');
+=======
+	onReceivePayloadCallbacks.forEach((callback) => { callback(payload); })
+>>>>>>> 4e412ffb12d3c2dcbe80b4899ec1793047dc240f
 };
 
 
