@@ -20,7 +20,7 @@ var data = {};
 //let data = "hello";
 
 
-var setup1 = function setup1() {
+var setup1 = exports.setup1 = function setup1() {
 	return shh.newKeyPair().then(function (id) {
 		data.asymKeyId1 = id;
 		return shh.getPublicKey(id).then(function (pubKey) {
@@ -28,6 +28,8 @@ var setup1 = function setup1() {
 			return shh.generateSymKeyFromPassword("eros");
 		}).then(function (symKeyId) {
 			data.symKeyId = symKeyId;
+			console.log(symKeyId);
+			return data;
 		}).catch(console.log);
 	}).catch(console.log);
 };
@@ -43,7 +45,7 @@ var setup2 = function setup2() {
 	}).catch(console.log);
 };
 
-var initListeners = function initListeners() {
+var initListeners = exports.initListeners = function initListeners() {
 	shh.subscribe('messages', {
 		topics: [activeModules[0]],
 		symKeyId: data.symKeyId

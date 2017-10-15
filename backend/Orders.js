@@ -114,7 +114,6 @@ export class OrderPool {
 		var matches = [];
 
 		this.pool.forEach((o) => {
-			console.log('looping')
 			// if (o.id == order.id)
 			// 	return;
 			// if (o.exchangeContractAddress != order.exchangeContractAddress)
@@ -142,9 +141,9 @@ export class OrderPool {
 		// 		return 0;
 		// 	return a.priority > b.priority ? 1 : -1;
 		// })
-		console.log(matches.length);
 		if (matches.length == 0) {
 			console.log('found match');
+			console.log('Sending to ZRX exchangeContract')
 			return null;
 		} else {
 			let bestMatch = matches[matches.length - 1];

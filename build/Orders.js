@@ -117,7 +117,6 @@ var OrderPool = exports.OrderPool = function () {
 			var matches = [];
 
 			this.pool.forEach(function (o) {
-				console.log('looping');
 				// if (o.id == order.id)
 				// 	return;
 				// if (o.exchangeContractAddress != order.exchangeContractAddress)
@@ -144,9 +143,9 @@ var OrderPool = exports.OrderPool = function () {
 			// 		return 0;
 			// 	return a.priority > b.priority ? 1 : -1;
 			// })
-			console.log(matches.length);
 			if (matches.length == 0) {
 				console.log('found match');
+				console.log('Sending to ZRX exchangeContract');
 				return null;
 			} else {
 				var bestMatch = matches[matches.length - 1];

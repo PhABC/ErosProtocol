@@ -35,7 +35,7 @@ const sendWhisper = function(identities, payload) {
 
   shh.generateSymKeyFromPassword("eros", (err, sym) => {
     shh.post({
-      symKeyId: '2055cbe82bdbdef761430923a9c639aa3f38bafd37300a5f43d3486d61e82485',
+      symKeyId: 'ab1c590df144a109ede6e012adb4725dd6d2ab5b5eee15d0ce5eabf49651e8d6',
       ttl: 7,
       topic: '0x676f6c65',
       powTarget: 2.01,
@@ -114,4 +114,5 @@ function submitSell() {
 
 $(function() {
   $(document).foundation();
+  $("#broadcastBuy").on('click', submitBuy);
 })

@@ -12,7 +12,7 @@ var data = {};
 //let data = "hello";
 
 
-const setup1 = () => {
+export const setup1 = () => {
 	return shh.newKeyPair()
 	.then(id => {
 		data.asymKeyId1 = id;
@@ -23,6 +23,8 @@ const setup1 = () => {
 		})
 		.then(symKeyId => {
 			data.symKeyId = symKeyId;
+			console.log(symKeyId);
+			return data;
 		}).catch(console.log);
 	}).catch(console.log);
 };
@@ -40,7 +42,7 @@ const setup2 = () => {
 	}).catch(console.log);
 };
 
-const initListeners = () => {
+export const initListeners = () => {
 	shh.subscribe('messages', {
 		topics: [activeModules[0]],
 			symKeyId: data.symKeyId
