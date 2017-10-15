@@ -240,11 +240,16 @@ contract ErosDiscoveryProtocol is SafeMath {
 	    return true;
 	}
 
+	function getTokenBalance(address _token) public constant returns(uint balance) {
+
+		return Token(_token).balanceOf(msg.sender);
+	}
+
 
 	function depositTokenBounty(address _token, uint _value) public returns (bool success) {
 
 		require(_value > 0);
-	    require(Token(_token).transferFrom(msg.sender, this, _value));
+	    require(Token(_token).transfer(this, _value));
 
 	    bounties[_token][msg.sender] = safeAdd(bounties[_token][msg.sender], _value);
 	    BountyDeposit(_token, msg.sender, _value, bounties[_token][msg.sender]);
@@ -283,9 +288,9 @@ contract ErosDiscoveryProtocol is SafeMath {
   		return true;
 	}
 
-	// Withdraw tokens from bounty
+	// Withdraw tokens from bounty1
 	function bountyWithdrawToken(address _token, uint _value) public returns (bool success) {
-	    require(_token != 0);
+	   require(_token != 0);
 	    require(_value > 0);
 	    require(bounties[_token][msg.sender] >= _value);
 
