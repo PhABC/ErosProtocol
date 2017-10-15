@@ -7,10 +7,13 @@ const fs = require('fs');
 const web3 = new Web3('ws://localhost:8546');
 const shh = web3.shh;
 
-const EROS_CONTRACT_ABI = JSON.parse(fs.readFileSync('ErosDiscoveryProtocol.json', 'utf8'));
+const NULL_ADDRESS = "0x0000000000000000000000000000000000000000";
+
+const EROS_CONTRACT_ABI = JSON.parse(fs.readFileSync('./build/ErosDiscoveryProtocol.json', 'utf8'));
+//console.log(EROS_CONTRACT_ABI);
 const EROS_CONTRACT_ADDRESS = '0x0123'; // TODO
 
-const erosContract = web3.eth.Contract(EROS_CONTRACT_ABI, EROS_CONTRACT_ADDRESS);
+const erosContract = new web3.eth.Contract(EROS_CONTRACT_ABI.abi);
 
 class Matcher {
 	constructor() {
@@ -21,14 +24,18 @@ class Matcher {
 
 	receivedPayload(payload) {
 		let order = Orders.orderFromPayload(payload);
-		if (this.orderPool.addOrder(order))
+		if (this.orderPool.addOrder(order)) {
+			console.log(this.orderPool.pool);
 			this.newOrder(order);
+		}
 	}
 
 	newOrder(order) {
 		this.orderPool.prune();
 		while (true) {
+
 			let match = this.orderPool.findBestMatch(order);
+			console.log('match', match);
 			if (match == null)
 				break;
 			let { orderA, orderB } = match;
@@ -37,41 +44,42 @@ class Matcher {
 	}
 
 	resolveMatch(orderA, orderB) {
+		console.log('not even here')
 		this.orderPool.removeOrder(orderA);
 		this.orderPool.removeOrder(orderB);
 		console.log('Found match');
-		erosContract.methods.settleMatchProposal(
-			[orderA.maker,
-			orderA.taker,
-			orderA.feeRecipient,
-			orderA.makerTokenAddress,
-			orderA.takerTokenAddress,
-			orderA.exchangeContractAddress],
-			[orderA.salt,
-			orderA.makerFee,
-			orderA.takerFee,
-			orderA.makerTokenAmount,
-			orderA.takerTokenAmount,
-			orderA.expirationUnixTimestampSec],
-			orderA.ecSignature.v,
-			orderA.ecSignature.r,
-			orderA.ecSignature.s,
-			[orderB.maker,
-			orderB.taker,
-			orderB.feeRecipient,
-			orderB.makerTokenAddress,
-			orderB.takerTokenAddress,
-			orderB.exchangeContractAddress],
-			[orderB.salt,
-			orderB.makerFee,
-			orderB.takerFee,
-			orderB.makerTokenAmount,
-			orderB.takerTokenAmount,
-			orderB.expirationUnixTimestampSec],
-			orderB.ecSignature.v,
-			orderB.ecSignature.r,
-			orderB.ecSignature.s
-		).send({ from: web3.eth.accounts[0] })
+		// erosContract.methods.settleMatchProposal(
+		// 	[orderA.maker,
+		// 	orderA.taker,
+		// 	orderA.feeRecipient,
+		// 	orderA.makerTokenAddress,
+		// 	orderA.takerTokenAddress,
+		// 	orderA.exchangeContractAddress],
+		// 	[orderA.salt,
+		// 	orderA.makerFee,
+		// 	orderA.takerFee,
+		// 	orderA.makerTokenAmount,
+		// 	orderA.takerTokenAmount,
+		// 	orderA.expirationUnixTimestampSec],
+		// 	orderA.ecSignature.v,
+		// 	orderA.ecSignature.r,
+		// 	orderA.ecSignature.s,
+		// 	[orderB.maker,
+		// 	orderB.taker,
+		// 	orderB.feeRecipient,
+		// 	orderB.makerTokenAddress,
+		// 	orderB.takerTokenAddress,
+		// 	orderB.exchangeContractAddress],
+		// 	[orderB.salt,
+		// 	orderB.makerFee,
+		// 	orderB.takerFee,
+		// 	orderB.makerTokenAmount,
+		// 	orderB.takerTokenAmount,
+		// 	orderB.expirationUnixTimestampSec],
+		// 	orderB.ecSignature.v,
+		// 	orderB.ecSignature.r,
+		// 	orderB.ecSignature.s
+		// ).send({ from: web3.eth.accounts[0] })
 	}
 }
 
@@ -149,7 +157,7 @@ class Matcher {
 
 setTimeout(() => {
 	Whisper.sendPayload(new Orders.Order(
-		'0x61e247f70bcc861819a801120eaac6fed99e79a2',
+		'0x61e247f70bcc861819a801120eaac6fed99e79a3',
 		NULL_ADDRESS,
 		NULL_ADDRESS,
 		'0x05d090b51c40b020eab3bfcb6a2dff130df22e9c',
@@ -160,13 +168,13 @@ setTimeout(() => {
 		new BigNumber(0),
 		new BigNumber(100000000000000000),
 		new BigNumber(100000000000000000),
-		new BigNumber(2524626000),
+		new BigNumber(2524626000000),
 		{
 			"r": "0xd0a10df781bf0a93cc096c7e9ff3f00d7721046502b6a0dfecfd7f4d52986932",
 			"s": "0x08498b0b79fccd55cb562858350535eb6ca1c024f660a3cfecd8c0d75fc2a4fe",
 			"v": 28
 		}
-	));
+	).toPayload());
 
 	Whisper.sendPayload(new Orders.Order(
 		'0x61e247f70bcc861819a801120eaac6fed99e79a2',
@@ -180,13 +188,13 @@ setTimeout(() => {
 		new BigNumber(0),
 		new BigNumber(100000000000000000),
 		new BigNumber(100000000000000000),
-		new BigNumber(2524626000),
+		new BigNumber(2524626000000),
 		{
 			"r": "0xb3e0def9372e2ee8e843e3196b677b9e6ba9ea17443473a22d4880b5ad5a13b1",
 			"s": "0x003e4bea39ace64b3057c04599029e7d58f22d8e06bad87a0757327bff418e03",
 			"v": 28
 		}
-	));
+	).toPayload());
 }, 500);
 
 let matcher = new Matcher();

@@ -62,7 +62,6 @@ const initListeners = () => {
 				...payload,
 				sig
 			};
-			console.log(data);
 			shh.post({
 				symKeyId: data.symKeyId,
 				ttl: 7,
@@ -72,7 +71,8 @@ const initListeners = () => {
 				payload: web3.utils.toHex(payload),
 				sig: data.asymKeyId2,
 			}, function(err, res) {
-				console.log(err);
+				if(err) return console.error(err);
+				console.log(res);
 			});
 			console.log('sent')
 		})
@@ -91,17 +91,17 @@ const onReceivePayload = (payload) => {
 };
 
 
-sendPayload({
-	maker: web3.eth.accounts[0],
-	taker: NULL_ADDRESS,
-	salt: ZeroEx.toBaseUnitAmount(new BigNumber(0.2), DECIMALS),
-	minRequestedTokenAmount: ZeroEx.toBaseUnitAmount(new BigNumber(0.2), DECIMALS),
-	maxRequestedTokenAmount: ZeroEx.toBaseUnitAmount(new BigNumber(0.2), DECIMALS),
-	requestedTokenAddress: '0x123',
-	offeredTokenAddress: '0x1234',
-	marketContractAddress: '0x125',
-	offeredTokenAmount: ZeroEx.toBaseUnitAmount(new BigNumber(0.2), DECIMALS),
-	price: ZeroEx.toBaseUnitAmount(new BigNumber(0.2), DECIMALS),
-	expiryTime: ZeroEx.toBaseUnitAmount(new BigNumber(0.2), DECIMALS),
-	matcherFee: ZeroEx.toBaseUnitAmount(new BigNumber(0.2), DECIMALS)
-});
+// sendPayload({
+// 	maker: web3.eth.accounts[0],
+// 	taker: NULL_ADDRESS,
+// 	salt: ZeroEx.toBaseUnitAmount(new BigNumber(0.2), DECIMALS),
+// 	minRequestedTokenAmount: ZeroEx.toBaseUnitAmount(new BigNumber(0.2), DECIMALS),
+// 	maxRequestedTokenAmount: ZeroEx.toBaseUnitAmount(new BigNumber(0.2), DECIMALS),
+// 	requestedTokenAddress: '0x123',
+// 	offeredTokenAddress: '0x1234',
+// 	marketContractAddress: '0x125',
+// 	offeredTokenAmount: ZeroEx.toBaseUnitAmount(new BigNumber(0.2), DECIMALS),
+// 	price: ZeroEx.toBaseUnitAmount(new BigNumber(0.2), DECIMALS),
+// 	expiryTime: ZeroEx.toBaseUnitAmount(new BigNumber(0.2), DECIMALS),
+// 	matcherFee: ZeroEx.toBaseUnitAmount(new BigNumber(0.2), DECIMALS)
+// });
