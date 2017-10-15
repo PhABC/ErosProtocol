@@ -37,8 +37,17 @@
                                 </div>
                             </div>
                             <div class="small-12 medium-6 columns">
-                                <div class="input-group"  style="margin-left:0">
-                                    <span style="border-color: #999" class="input-group-label">Fee</span>
+                                <div class="input-group"  style="margin-left:0;display:flex;">
+                                    <select>
+                                        <option value="eth">ETH</option>
+                                        <option value="btc">BTC</option>
+                                        <option value="xmr">XMR</option>
+                                        <option value="etc">ETC</option>
+                                        <option value="btc">LTC</option>
+                                        <option value="xmr">GAME</option>
+                                        <option value="etc">DFN</option>
+                                        <option value="etc">ZEC</option>
+                                    </select>
                                     <input id="feeBuy" class="input-group-field" step=".1" min="0" placeholder="max fee" type="number">
                                 </div>
                             </div>
@@ -84,7 +93,7 @@
     <h1 style="text-align: center;">Awesome. <br>It's whispering.</h1>
     <img style="margin:0 auto;" src="assets/img/spinner.gif">
     <p style="color: forestgreen; text-align: center;">Propagating order, please stand by.</p>
-    <div data-open="exampleModal2" class="button">fake order completion.</div>
+    <div data-open="exampleModal2" data-close class="button">fake order completion.</div>
     <button class="close-button" data-close aria-label="Close modal" type="button">
         <span aria-hidden="true">&times;</span>
     </button>
