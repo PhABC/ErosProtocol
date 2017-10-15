@@ -12,7 +12,6 @@ import fs       from 'fs';
 
 // Load all Gulp plugins into one variable
 const $ = plugins();
-
 // Check for --production flag
 const PRODUCTION = !!(yargs.argv.production);
 
@@ -36,8 +35,10 @@ gulp.task('build',
 
 // Build the site, run the server, and watch for file changes
 gulp.task('default',
-  gulp.series('build', server, watch));
+  gulp.series('build'));
 
+gulp.task('server',
+  gulp.series(server));
 // Delete the "dist" folder
 // This happens every time a build starts
 function clean(done) {
