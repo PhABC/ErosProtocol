@@ -61,6 +61,7 @@ const initListeners = () => {
 				...payload,
 				sig
 			};
+			console.log(data);
 			shh.post({
 				symKeyId: data.symKeyId,
 				ttl: 7,

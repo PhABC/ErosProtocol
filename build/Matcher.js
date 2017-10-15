@@ -9,17 +9,38 @@ var Whisper = require('./Whisper.js');
 var Web3 = require('web3');
 var BigNumber = require('bignumber.js');
 var fs = require('fs');
+var ZeroEx = require('0x.js').ZeroEx;
 
-var web3 = new Web3('ws://localhost:8546');
-var shh = web3.shh;
+var zeroEx = new ZeroEx(new Web3.providers.HttpProvider('http://localhost:8545'));
 
 var NULL_ADDRESS = "0x0000000000000000000000000000000000000000";
+
+var web3 = new Web3('http://localhost:8545');
+var shh = web3.shh;
 
 var EROS_CONTRACT_ABI = JSON.parse(fs.readFileSync('./build/ErosDiscoveryProtocol.json', 'utf8'));
 //console.log(EROS_CONTRACT_ABI);
 var EROS_CONTRACT_ADDRESS = '0x0123'; // TODO
 
 var erosContract = new web3.eth.Contract(EROS_CONTRACT_ABI.abi);
+// const EROS_CONTRACT_JSON = JSON.parse(fs.readFileSync('./build/ErosDiscoveryProtocol.json', 'utf8'));
+// const EROS_CONTRACT_ABI = EROS_CONTRACT_JSON.abi;
+// const EROS_CONTRACT_BYTECODE = EROS_CONTRACT_JSON.bytecode;
+
+var accounts = void 0;
+
+// zeroEx.getAvailableAddressesAsync().then((a) => {
+// 	accounts = a;
+// }).then(() => {
+// 	new web3.eth.Contract(EROS_CONTRACT_ABI).deploy(
+// 		{ data: EROS_CONTRACT_BYTECODE }
+// 	).send(
+// 		{ from: accounts[0], gas: 4712388 }
+// 	).then((contract) => {
+// 		erosContract = contract;
+// 		EROS_CONTRACT_ADDRESS = erosContract.options.address;
+// 	});
+// });
 
 var Matcher = function () {
 	function Matcher() {
@@ -39,7 +60,6 @@ var Matcher = function () {
 		value: function receivedPayload(payload) {
 			var order = Orders.orderFromPayload(payload);
 			if (this.orderPool.addOrder(order)) {
-				console.log(this.orderPool.pool);
 				this.newOrder(order);
 			}
 		}
@@ -50,7 +70,6 @@ var Matcher = function () {
 			while (true) {
 
 				var match = this.orderPool.findBestMatch(order);
-				console.log('match', match);
 				if (match == null) break;
 				var orderA = match.orderA,
 				    orderB = match.orderB;
@@ -61,10 +80,8 @@ var Matcher = function () {
 	}, {
 		key: 'resolveMatch',
 		value: function resolveMatch(orderA, orderB) {
-			console.log('not even here');
 			this.orderPool.removeOrder(orderA);
 			this.orderPool.removeOrder(orderB);
-			console.log('Found match');
 			// erosContract.methods.settleMatchProposal(
 			// 	[orderA.maker,
 			// 	orderA.taker,
@@ -96,7 +113,7 @@ var Matcher = function () {
 			// 	orderB.ecSignature.v,
 			// 	orderB.ecSignature.r,
 			// 	orderB.ecSignature.s
-			// ).send({ from: web3.eth.accounts[0] })
+			// ).send({ from: accounts[0], gas: 4712388 })
 		}
 	}]);
 
@@ -176,13 +193,13 @@ var Matcher = function () {
 // }
 
 setTimeout(function () {
-	Whisper.sendPayload(new Orders.Order('0x61e247f70bcc861819a801120eaac6fed99e79a3', NULL_ADDRESS, NULL_ADDRESS, '0x05d090b51c40b020eab3bfcb6a2dff130df22e9c', '0x6ff6c0ff1d68b964901f986d4c9fa3ac68346570', '0x90fe2af704b34e0224bf2299c838e04d4dcf1364', new BigNumber('39589075312651349180760471522600091342093681980948679803390783021018056140589'), new BigNumber(0), new BigNumber(0), new BigNumber(100000000000000000), new BigNumber(100000000000000000), new BigNumber(2524626000000), {
+	Whisper.sendPayload(new Orders.Order('0x61e247f70bcc861819a801120eaac6fed99e79a3', NULL_ADDRESS, NULL_ADDRESS, '0x05d090b51c40b020eab3bfcb6a2dff130df22e9c', '0x6ff6c0ff1d68b964901f986d4c9fa3ac68346570', '0x90fe2af704b34e0224bf2299c838e04d4dcf1364', new BigNumber('39589075312651349180760471522600091342093681980948679803390783021018056140589'), new BigNumber(0), new BigNumber(0), new BigNumber(100000000000000000), new BigNumber(100000000000000000), new BigNumber(2524626000000000), {
 		"r": "0xd0a10df781bf0a93cc096c7e9ff3f00d7721046502b6a0dfecfd7f4d52986932",
 		"s": "0x08498b0b79fccd55cb562858350535eb6ca1c024f660a3cfecd8c0d75fc2a4fe",
 		"v": 28
 	}).toPayload());
 
-	Whisper.sendPayload(new Orders.Order('0x61e247f70bcc861819a801120eaac6fed99e79a2', NULL_ADDRESS, NULL_ADDRESS, '0x6ff6c0ff1d68b964901f986d4c9fa3ac68346570', '0x05d090b51c40b020eab3bfcb6a2dff130df22e9c', '0x90fe2af704b34e0224bf2299c838e04d4dcf1364', new BigNumber('43738917490084901392871299417845878250738351153054419227077950746415518229033'), new BigNumber(0), new BigNumber(0), new BigNumber(100000000000000000), new BigNumber(100000000000000000), new BigNumber(2524626000000), {
+	Whisper.sendPayload(new Orders.Order('0x61e247f70bcc861819a801120eaac6fed99e79a2', NULL_ADDRESS, NULL_ADDRESS, '0x6ff6c0ff1d68b964901f986d4c9fa3ac68346570', '0x05d090b51c40b020eab3bfcb6a2dff130df22e9c', '0x90fe2af704b34e0224bf2299c838e04d4dcf1364', new BigNumber('43738917490084901392871299417845878250738351153054419227077950746415518229033'), new BigNumber(0), new BigNumber(0), new BigNumber(100000000000000000), new BigNumber(100000000000000000), new BigNumber(2524626000000000), {
 		"r": "0xb3e0def9372e2ee8e843e3196b677b9e6ba9ea17443473a22d4880b5ad5a13b1",
 		"s": "0x003e4bea39ace64b3057c04599029e7d58f22d8e06bad87a0757327bff418e03",
 		"v": 28
@@ -190,3 +207,10 @@ setTimeout(function () {
 }, 500);
 
 var matcher = new Matcher();
+
+// setTimeout(() => {
+// 	// Whisper.sendPayload(orderA.toPayload());
+// 	// Whisper.sendPayload(orderB.toPayload());
+// 	matcher.receivedPayload(orderA.toPayload());
+// 	matcher.receivedPayload(orderB.toPayload());
+// }, 500);

@@ -13,32 +13,29 @@ let EROS_CONTRACT_ADDRESS;
 
 let erosContract;
 
-$.getJSON("/assets/ErosDiscoveryProtocol.json", (json) => {
-    EROS_CONTRACT_ABI = json;
-    EROS_CONTRACT_ADDRESS = '0x0123'; // TODO
+// $.getJSON("/assets/ErosDiscoveryProtocol.json", (json) => {
+//     EROS_CONTRACT_ABI = json;
+//     EROS_CONTRACT_ADDRESS = '0x0123'; // TODO
+//
+//     erosContract = web3.eth.contract(EROS_CONTRACT_ABI.abi);
+//
+//     let abi;
+//     EROS_CONTRACT_ABI.abi.forEach((obj) => {
+//         if (obj.name == "settleMatchProposal")
+//             abi = obj;
+//     })
+//     abiDecoder.addABI(abi);
+// });
 
-    erosContract = web3.eth.contract(EROS_CONTRACT_ABI.abi);
 
-    let abi;
-    EROS_CONTRACT_ABI.abi.forEach((obj) => {
-        if (obj.name == "settleMatchProposal")
-            abi = obj;
-    })
-    abiDecoder.addABI(abi);
-});
-
-const whisperSetup = function () {
-  return web3.shh.generateSymKeyFromPassword("eros", (err, sym) => {
-    identities['sym'] = sym;
-  })
-};
 
 const sendWhisper = function(identities, payload) {
   const Shh = require('web3-shh');
   const shh = new Shh('ws://localhost:8546');
-    console.log(identities);
+
+  shh.generateSymKeyFromPassword("eros", (err, sym) => {
     shh.post({
-      symKeyId: 'c1496cd0731bab44a6c389ef146eb891b5df6e1708058b484966b484847a8fc6',
+      symKeyId: '2055cbe82bdbdef761430923a9c639aa3f38bafd37300a5f43d3486d61e82485',
       ttl: 7,
       topic: '0x676f6c65',
       powTarget: 2.01,
@@ -49,6 +46,8 @@ const sendWhisper = function(identities, payload) {
       if(result) console.log(result)
       console.log('sent');
     });
+  })
+
 };
 
 // erosContract.events.MatchedEvent({}, (error, event) => {
@@ -76,18 +75,19 @@ const sendWhisper = function(identities, payload) {
 window.submitBuy = function() {
 
   var obj = {
-      maker: web3.eth.accounts[0],
+      maker: '0x61e247f70bcc861819a801120eaac6fed99e79a3',
       taker: NULL_ADDRESS,
+      feeRecipient: NULL_ADDRESS,
+      makerTokenAddress: '0x123',
+      takerTokenAddress: '0x1234',
+      exchangeContractAddress: '0x125',
       salt: ZeroEx.toBaseUnitAmount(new BigNumber(0.2), DECIMALS),
-      minRequestedTokenAmount: ZeroEx.toBaseUnitAmount(new BigNumber(0.2), DECIMALS),
-      requestedTokenAddress: '0x123',
-      offeredTokenAddress: '0x1234',
-      marketContractAddress: '0x125',
-      offeredTokenAmount: ZeroEx.toBaseUnitAmount(new BigNumber($("#amountBuy").val()), DECIMALS),
-      price: ZeroEx.toBaseUnitAmount(new BigNumber($("#price").val()), DECIMALS),
-      expiryTime: ZeroEx.toBaseUnitAmount(new BigNumber($("#ttl").val()), DECIMALS),
-      matcherFee: ZeroEx.toBaseUnitAmount(new BigNumber($("#feeBuy").val()), DECIMALS)
-  }
+      makerFee: ZeroEx.toBaseUnitAmount(new BigNumber($("#feeBuy").val()), DECIMALS),
+      takerFee: ZeroEx.toBaseUnitAmount(new BigNumber($("#feeBuy").val()), DECIMALS),
+      makerTokenAmount: ZeroEx.toBaseUnitAmount(new BigNumber($("#amountBuy").val()), DECIMALS),
+      takerTokenAmount: ZeroEx.toBaseUnitAmount(new BigNumber($("#amountBuy").val()), DECIMALS),
+      expirationUnixTimestampSec: ZeroEx.toBaseUnitAmount(new BigNumber($("#ttl").val()), DECIMALS)
+  };
 
 
   var from = web3.eth.accounts[0];
@@ -114,5 +114,4 @@ function submitSell() {
 
 $(function() {
   $(document).foundation();
-  whisperSetup();
 })

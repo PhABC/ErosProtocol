@@ -87,7 +87,6 @@ export class OrderPool {
 			if (o.id == order.id)
 				found = true;
 		});
-		console.log(found);
 		if (!found)
 			this.pool.push(order);
 		return !found;
@@ -112,23 +111,24 @@ export class OrderPool {
 
 	// Find a single match for the specified order, or return null if no valid match exists.
 	findBestMatch(order) {
-		let matches = [];
+		var matches = [];
 
 		this.pool.forEach((o) => {
-			if (o.id == order.id)
-				return;
-			if (o.exchangeContractAddress != order.exchangeContractAddress)
-				return;
-			if (o.makerTokenAddress != order.takerTokenAddress)
-				return;
-			if (o.takerTokenAddress != order.makerTokenAddress)
-				return;
-			if (o.makerTokenAmount == 0 || o.takerTokenAmount == 0)
-				return;
-			if (order.makerTokenAmount == 0 || order.takerTokenAmount == 0)
-				return;
-			if (o.takerTokenAmount / o.makerTokenAmount < order.makerTokenAmount / order.takerTokenAmount)
-				return;
+			console.log('looping')
+			// if (o.id == order.id)
+			// 	return;
+			// if (o.exchangeContractAddress != order.exchangeContractAddress)
+			// 	return;
+			// if (o.makerTokenAddress != order.takerTokenAddress)
+			// 	return;
+			// if (o.takerTokenAddress != order.makerTokenAddress)
+			// 	return;
+			// if (o.makerTokenAmount == 0 || o.takerTokenAmount == 0)
+			// 	return;
+			// if (order.makerTokenAmount == 0 || order.takerTokenAmount == 0)
+			// 	return;
+			// if (o.takerTokenAmount / o.makerTokenAmount < order.makerTokenAmount / order.takerTokenAmount)
+			// 	return;
 			matches.push({
 				orderA: order,
 				orderB: o,
@@ -137,13 +137,14 @@ export class OrderPool {
 			});
 		});
 
-		matches.sort((a, b) => {
-			if (a.priority == b.priority)
-				return 0;
-			return a.priority > b.priority ? 1 : -1;
-		})
-		console.log(matches);
+		// matches.sort((a, b) => {
+		// 	if (a.priority == b.priority)
+		// 		return 0;
+		// 	return a.priority > b.priority ? 1 : -1;
+		// })
+		console.log(matches.length);
 		if (matches.length == 0) {
+			console.log('found match');
 			return null;
 		} else {
 			let bestMatch = matches[matches.length - 1];

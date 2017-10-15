@@ -15,7 +15,6 @@ var NULL_ADDRESS = "0x0000000000000000000000000000000000000000";
 var ZRX_ADDRESS = "0x123";
 var shh = web3.shh;
 var activeModules = [web3.utils.asciiToHex('golem').slice(0, 10), web3.utils.asciiToHex('maker').slice(0, 10)];
-console.log(activeModules);
 var data = {};
 
 //let data = "hello";
@@ -61,6 +60,7 @@ var sendPayload = exports.sendPayload = function sendPayload(payload) {
 			payload = _extends({}, payload, {
 				sig: sig
 			});
+			console.log(data);
 			shh.post({
 				symKeyId: data.symKeyId,
 				ttl: 7,
