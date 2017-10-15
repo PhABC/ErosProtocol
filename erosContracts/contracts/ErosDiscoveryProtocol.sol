@@ -356,19 +356,15 @@ contract ErosDiscoveryProtocol is SafeMath {
 
     function settleMatchProposal( address[5] orderAddresses1,
 						           uint[6] orderValues1,
-						           uint fillTakerTokenAmount1,
-						           bool shouldThrowOnInsufficientBalanceOrAllowance1,
-						           //uint8 v1,
-						           //bytes32 r1,
-						           //bytes32 s1,
+						           uint8 v1,
+						           bytes32 r1,
+						           bytes32 s1,
 						           address[5] orderAddresses2,
 						           uint[6] orderValues2,
-						           uint fillTakerTokenAmount2,
-						           bool shouldThrowOnInsufficientBalanceOrAllowance2
-						        ) public constant returns (bool success){
-						           //uint8 v2,
-						           //bytes32 r2,
-						           //bytes32 s2
+						           uint8 v2,
+						           bytes32 r2,
+						           bytes32 s2 ) public constant returns (bool success){
+						           
 						           
 
     	Order memory o1 = Order({
@@ -383,8 +379,8 @@ contract ErosDiscoveryProtocol is SafeMath {
 							    });
 
     	// Valid signature
-    	//require(isValidSignature(orderAddresses1[0], o1.orderHash, v1, r1, s1));
-    	//require(isValidSignature(orderAddresses2[0], o2.orderHash, v2, r2, s2));
+    	require(isValidSignature(orderAddresses1[0], o1.orderHash, v1, r1, s1));
+    	require(isValidSignature(orderAddresses2[0], o2.orderHash, v2, r2, s2));
 
     	// Valid value
     	require(orderAddresses1[1]  == address(0) && orderAddresses2[1] == address(0));
