@@ -303,8 +303,13 @@ contract ErosDiscoveryProtocol is SafeMath {
 		// total bounty
 		bounty = safeAdd(bounties[_token][_maker1], bounties[_token][_maker2]);
 
+		// Delete bounties
 		bounties[_token][_maker1] = 0;
 		bounties[_token][_maker2] = 0;
+
+		// Remove permission from taking bounties
+		canClaimBounty[_maker1] = 0x0;
+    	canClaimBounty[_maker2] = 0x0;
 
 		require(Token(_token).transfer(msg.sender, bounty));
 
@@ -398,11 +403,11 @@ contract ErosDiscoveryProtocol is SafeMath {
     	require(orderAddresses1[2] == orderAddresses2[3] && orderAddresses2[2] == orderAddresses1[3]);
 
     	// Value overlap 
-    	// o1price = safeDiv(orderValues1[0], orderValues1[1]);
-    	// o2price = safeDiv(orderValues2[1], orderValues2[0]);
+    	o1price = safeDiv(orderValues1[0], orderValues1[1]);
+    	o2price = safeDiv(orderValues2[1], orderValues2[0]);
 
     	// Make sure there is an overlap in price
-    	// require(o1price > o2price);
+    	require(o1price > o2price);
 
     	// Giving permission to Matcher from taking bounties
     	canClaimBounty[orderAddresses1[0]] = msg.sender;
