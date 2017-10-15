@@ -60,6 +60,7 @@
 #home {
   .hero-section-text {
     height: 100%;
+    min-height: 777px;
     margin-top:0;
     .tabs {
       border-radius: 0 15px 0 0;
@@ -127,3 +128,251 @@
 }
 
 body,html {height: 100%;}
+
+
+$card-user-profile-bg: $card-background;
+$card-user-profile-text-color: $body-font-color;
+$base_1:  #000000;
+$base_11: #494d55;
+$base_12: #31343a;
+$base_13: #26282c;
+$base_14: #c1c1c1;
+$base_15: #797f8b;
+$base_16: #494d55;
+
+$base_2:  #ffffff;
+$base_21: #f6f6f6;
+$base_22: rgba(255, 255, 255, 0.7);
+$base_23: #f2f2f2;
+$base_24: #fefefe;
+
+$primary_1: #42d5ae;
+$primary_2: #1779ba;
+
+
+.card-base {
+  position: relative;
+  z-index: 0;
+  @include card-container($card-user-profile-bg, $card-user-profile-text-color, 1rem, $global-radius);
+  opacity: 1;
+  -webkit-box-shadow: 0 1px 1px 0 rgba(0,0,0,0.14), 0 1px 5px 0 rgba(0,0,0,0.12), 0 3px 1px -2px rgba(0,0,0,0.2);
+  box-shadow: 0 1px 1px 0 rgba(0,0,0,0.14), 0 1px 5px 0 rgba(0,0,0,0.12), 0 3px 1px -2px rgba(0,0,0,0.2);
+  .card-section {
+    padding: 0;
+  }
+  .card-title {
+    position: relative;
+    font-weight: 600;
+    top: 2px;
+    left: 10px;
+    color: $base_11;
+    font-size: 14px;
+  }
+  .card-background {
+    height: 118px;
+    background-color: $primary_1;
+  }
+
+  .card-user-profile-content {
+    position: relative;
+
+    &::before {
+      position: absolute;
+      content: '';
+      top: -5.5rem;
+      left: rem-calc(-30);
+      width: 0;
+      height: 0;
+      border-style: solid;
+      border-width: 5.5rem 0 0 243rem;
+      z-index: 0;
+      border-color: transparent transparent transparent $card-user-profile-bg;
+    }
+  }
+
+  &.statistics {
+    .card-background {
+      height: 28px;
+    }
+    .card-user-profile-name {
+      font-weight: 600;
+      font-size: 1.35rem;
+      margin: 20px 20px 0;
+      border-bottom: 1px solid $base_23;
+      padding-bottom: 20px;
+      height: auto;
+      &:last-of-type {
+        border: 0;
+      }
+    }
+  }
+
+  &.workers-table {
+    padding: 10px 30px 0;
+    padding-bottom: 25px;
+    margin-bottom: 35px;
+    box-shadow: none;
+    border-top: 1px solid $primary_1;
+    .card-background {
+      height: 28px;
+      background-color: white;
+    }
+    .card-title {
+      position: relative;
+      border-bottom: 1px solid #f3f3f7;
+      &.connect {
+        font-size: 22px;
+      }
+    }
+    .card-user-profile-name {
+      font-size: 1rem;
+      height: auto;
+    }
+  }
+
+  &.charts {
+    padding: 10px 30px 20px 30px;
+  }
+}
+
+.icon_info_alt {
+  font-size: 15px;
+  color: $base_14;
+}
+
+.card-user-profile-actions {
+  @include card-divider;
+  background: $card-user-profile-bg;
+  display: flex;
+}
+
+.card-user-profile-img {
+  max-width: 100%;
+  opacity: 0.85;
+  transition: all 0.25s ease;
+  height: 100px;
+}
+
+.card-user-profile-avatar {
+  position: relative;
+  bottom: 100%;
+  left: 1rem;
+  z-index: 2;
+  //max-width: rem-calc(90);
+  display: flex;
+  align-items: center;
+
+  img {
+    border-radius: 50%;
+    box-shadow: 0 0 15px rgba($black, 0.3);
+  }
+
+  p{
+    color: $base_13;
+    font-size: 14px;
+  }
+}
+
+.card-user-profile-name {
+  margin-bottom: 0;
+  font-weight: 600;
+  font-size: 1.35rem;
+  margin-left: 15px;
+  height: 55px;
+}
+
+.card-user-profile-button {
+  margin-bottom: 0;
+  flex: 1 0 0;
+
+  + .card-user-profile-button {
+    margin-left: 1rem;
+  }
+}
+
+.card-user-profile-info {
+  font-size: 0.875rem;
+  letter-spacing: 1px;
+  opacity: 0.8;
+}
+
+.progress .progress-meter {
+  -moz-transition:width 1.7s ease;
+  -webkit-transition:width 1.7s ease;
+  -transition:width 1.7s ease;
+}
+
+.credits {
+  color: $primary_1;
+}
+
+.align-center-middle-modules {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+
+}
+
+.ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 10px;
+}
+
+.homepage {
+  .card-user-profile-content {
+    &::before {
+      top:-2rem;
+      border-width: 2.5rem 0 0 154rem;
+    }
+  }
+  &.card-base {
+    .card-background {
+      height: 63px;
+    }
+  }
+  .card-base {
+    &.workers-table {
+      padding: 0;
+    }
+  }
+}
+
+.hashrate {
+  width:100%;
+  height: 200px;
+}
+
+
+
+@media print, screen and (min-width: 64em) {
+  .row.rows-stats {
+    margin: 0 40px;
+    .workers-table {
+      border-top: 0;
+    }
+
+  }
+}
+
+@media print, screen and (max-width: 50em) {
+  .card-user-profile-name {
+    font-size: 1rem;
+    font-weight: 600;
+  }
+  .row.rows-stats {
+    margin: 0 50px;
+    .workers-table {
+      border-top: 0;
+    }
+  }
+}
+
+@media print, screen and (max-width: 450px) {
+  .card-user-profile-name {
+    font-size: 0.7rem;
+    font-weight: 600;
+  }
+}
