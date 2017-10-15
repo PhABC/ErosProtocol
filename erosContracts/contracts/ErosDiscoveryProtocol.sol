@@ -205,7 +205,7 @@ contract ErosDiscoveryProtocol is SafeMath {
 
 	// uint8 boundPenality = 50; // Percentage of bound lost when infractiong happen
 
-	function ErosJuridistiction() {
+	function ErosDiscoveryProtocol() {
 		owner = msg.sender;
 	}
 
@@ -222,6 +222,10 @@ contract ErosDiscoveryProtocol is SafeMath {
 		require(now > bountyWithdrawUnlockPeriod[msg.sender]);
 		_;
 
+	}
+
+	function getOwner() public constant returns (address own){
+		return owner;
 	}
 
 	//  ---------------------FEE/BOUNRTY DEPOSIT & WITHDRAWL---------------------------------
@@ -267,7 +271,7 @@ contract ErosDiscoveryProtocol is SafeMath {
 
 
 	// Withdrwa ETH from bounty
-	function bountyWithdrawEther(uint _value) public bountyWithdrawAllowed returns (bool success) {
+	function bountyWithdrawEther(uint _value) public returns (bool success) {
 		require(_value > 0);
 	    require(bounties[0][msg.sender] >= _value);
 
@@ -280,7 +284,7 @@ contract ErosDiscoveryProtocol is SafeMath {
 	}
 
 	// Withdraw tokens from bounty
-	function bountyWithdrawToken(address _token, uint _value) public bountyWithdrawAllowed returns (bool success) {
+	function bountyWithdrawToken(address _token, uint _value) public returns (bool success) {
 	    require(_token != 0);
 	    require(_value > 0);
 	    require(bounties[_token][msg.sender] >= _value);
