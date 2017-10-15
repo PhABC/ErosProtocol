@@ -25,6 +25,7 @@ class Matcher {
 			let match = this.orderPool.findBestMatch(order);
 			if (match == null)
 				break;
+			let { makerOrder, takerOrder, makerOfferedAmount, takerOfferedAmount } = match;
 			this.resolveMatch(makerOrder, takerOrder, makerOfferedAmount, takerOfferedAmount);
 		}
 	}
