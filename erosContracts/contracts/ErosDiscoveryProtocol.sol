@@ -224,6 +224,10 @@ contract ErosDiscoveryProtocol is SafeMath {
 
 	}
 
+	function getOwner() public constant returns (address own){
+		return owner;
+	}
+
 	//  ---------------------FEE/BOUNRTY DEPOSIT & WITHDRAWL---------------------------------
 
 	function depositEtherBounty() public payable returns (bool success) {
