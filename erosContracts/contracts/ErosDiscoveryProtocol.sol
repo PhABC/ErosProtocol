@@ -177,6 +177,24 @@ contract ErosDiscoveryProtocol is SafeMath {
 	event BountyDeposit(address token, address indexed user, uint _value, uint balance);
 	event BountyWithdrawRequest(address token, address indexed user, uint _value, uint balance);
 	event BountyWithdraw(address token, address indexed user, uint _value, uint balance);
+	event MatchFound(address matcher, address maker, address taker);
+	event BountyClaimed(address matcher, address maker, address taker, uint bounty);
+
+	// 0x Order
+	struct Order {
+        address maker;
+        address taker;
+        address makerToken;
+        address takerToken;
+        address feeRecipient;
+        uint makerTokenAmount;
+        uint takerTokenAmount;
+        uint makerFee;
+        uint takerFee;
+        uint expirationTimestampInSec;
+        bytes32 orderHash;
+    }
+
 
 	address public owner; //Contract owner
 
@@ -187,7 +205,9 @@ contract ErosDiscoveryProtocol is SafeMath {
 	mapping (address => mapping (address => uint256)) public bounties; // Mapping of token addresses to mapping of account balances for
 	mapping (address => uint256) bountyWithdrawUnlockPeriod;  //When user can unlock bounty funds
 	mapping (address => uint256) bonutyWithdrawApprovedValue; //When user can unlock bounty funds
-	
+
+	mapping (address => address) orderVerificationContract; // Allow smart contract to specify their order verification protocol 
+	mapping (address => address) canClaimBounty; // Will say who can claim a current stake bounty
 	
 	// uint32 boundsWithdrawPendingPeriod = 30 days;    //_value of time before bounds can be withdrawn
 	uint32 bountyWithdrawPendingPeriod = 30 minutes; //_value of time before bounties (matching fees) can be withdrawn
@@ -213,7 +233,7 @@ contract ErosDiscoveryProtocol is SafeMath {
 
 	}
 
-	//  ---------------------FEE DEPOSIT AND ORDER SETTLEMENT ---------------------------------
+	//  ---------------------FEE/BOUNRTY DEPOSIT & WITHDRAWL---------------------------------
 
 	function depositEtherBounty() public payable returns (bool success) {
 	  	
@@ -281,6 +301,152 @@ contract ErosDiscoveryProtocol is SafeMath {
 
   		return true;
 	}
+
+	// Matcher claiming the bounties
+	function bountyClaimToken(address, _token, address _maker1, address _maker2) public constant return(bool success){
+
+		require(canClaimBounty[_maker1] == msg.sender && canClaimBounty[_maker2] == msg.sender);
+
+		// total bounty
+		bounty = safeAdd(bounties[_token][_maker1], bounties[_token][_maker2]);
+
+		bounties[_token][_maker1] = 0;
+		bounties[_token][_maker2] = 0;
+
+		require(Token(_token).transfer(msg.sender, bounty))
+
+		BountyClaimed(msg.sender, _maker1,  _maker2, bounty);
+
+		return true
+		
+	}
+
+	//  -----------------------ORDER VERIFICATION AND SETTLEMENT--------------------------
+
+
+	function isValidSignature( address signer, bytes32 hash, uint8 v, 
+	 						   bytes32 r, bytes32 s ) public constant returns (bool success)
+    {
+        return signer == ecrecover( keccak256("\x19Ethereum Signed Message:\n32", hash),
+            						v, r, s  );
+    }
+
+
+    function settleMatchProposal( address[5] orderAddresses1,
+						           uint[6] orderValues1,
+						           uint fillTakerTokenAmount1,
+						           bool shouldThrowOnInsufficientBalanceOrAllowance1,
+						           uint8 v1,
+						           bytes32 r1,
+						           bytes32 s1,
+
+						           address[5] orderAddresses2,
+						           uint[6] orderValues2,
+						           uint fillTakerTokenAmount2,
+						           bool shouldThrowOnInsufficientBalanceOrAllowance2,
+						           uint8 v2,
+						           bytes32 r2,
+						           bytes32 s2) public constant return (bool success){
+
+    	Order storage o1 = Order({
+							          maker: orderAddresses1[0],
+							          taker: orderAddresses1[1],
+							          makerToken: orderAddresses1[2],
+							          takerToken: orderAddresses1[3],
+							          feeRecipient: orderAddresses1[4],
+							          makerTokenAmount: orderValues1[0],
+							          takerTokenAmount: orderValues1[1],
+							          makerFee: orderValues1[2],
+							          takerFee: orderValues1[3],
+							          expirationTimestampInSec: orderValues1[4],
+							          orderHash: getOrderHash(orderAddresses1, orderValues1)
+							        });
+
+
+    	Order storage o2 = Order({
+							          maker: orderAddresses2[0],
+							          taker: orderAddresses2[1],
+							          makerToken: orderAddresses2[2],
+							          takerToken: orderAddresses2[3],
+							          feeRecipient: orderAddresses2[4],
+							          makerTokenAmount: orderValues2[0],
+							          takerTokenAmount: orderValues2[1],
+							          makerFee: orderValues2[2],
+							          takerFee: orderValues2[3],
+							          expirationTimestampInSec: orderValues2[4],
+							          orderHash: getOrderHash(orderAddresses2, orderValues2)
+							        });
+
+    	// Valid signature
+    	require(isValidSignature(o1.maker, o1.orderHash, v1, r1, s1));
+    	require(isValidSignature(o2.maker, o2.orderHash, v2, r2, s2));
+
+    	// Valid value
+    	require(o1.taker  == address(0) && o2.taker == address(0));
+    	require(o1.makerTokenAmount > 0 && o1.takerTokenAmount1 > 0);
+    	require(o2.makerTokenAmount > 0 && o2.takerTokenAmount1 > 0);
+
+    	// Valid timestamp
+    	require(block.timestamp >= o1.expirationTimestampInSec);
+    	require(block.timestamp >= o2.expirationTimestampInSec);
+
+    	// Valid funds
+    	require(Token(o1.makerToken).balanceOf(o1.maker) >= o1.makerTokenAmount);
+    	require(Token(o2.makerToken).balanceOf(o2.maker) >= o2.makerTokenAmount);
+
+    	// Compabtible tokens 
+    	require(o1.makerToken == o2.takerToken && o2.makerToken == o1.takerToken)
+
+    	// Value overlap 
+    	o1price = safeDiv(o1.makerTokenAmount, o1.takerTokenAmount);
+    	o2price = safeDiv(o2.takerTokenAmount, o2.makerTokenAmount);
+
+    	// Make sure there is an overlap in price
+    	require(o1price > o2price);
+
+    	// Giving permission to Matcher from taking bounties
+    	canClaimBounty[o1.maker] = msg.sender;
+    	canClaimBounty[o2.maker] = msg.sender;
+
+    	// 
+    	MatchFound(msg.sender, o1.maker, o2.maker)
+
+    	return success
+    }
+
+
+
+
+
+    }
+
+    function getOrderHash(address[5] orderAddresses, uint[6] orderValues)
+        public
+        constant
+        returns (bytes32)
+    {
+        return keccak256(
+			              address(this),
+			              orderAddresses[0], // maker
+			              orderAddresses[1], // taker
+			              orderAddresses[2], // makerToken
+			              orderAddresses[3], // takerToken
+			              orderAddresses[4], // feeRecipient
+			              orderValues[0],    // makerTokenAmount
+			              orderValues[1],    // takerTokenAmount
+			              orderValues[2],    // makerFee
+			              orderValues[3],    // takerFee
+			              orderValues[4],    // expirationTimestampInSec
+			              orderValues[5]     // salt
+       				     );
+    }
+
+    // Mapping a smart contract with its order validation smart contract
+    // function assignOrderValidationContract(address _mainContract, address _orderValidationContract) public return (bool success) {
+
+    //	externalOwner = 
+
+    //}
 
 
 	//  ---------------------BOUNDS FOR MATCHER INTEGRETY ---------------------------------
