@@ -14,7 +14,7 @@ class Matcher {
 	}
 
 	receivedPayload(payload) {
-		order = Orders.orderFromPayload(payload);
+		let order = Orders.orderFromPayload(payload);
 		if (this.orderPool.addOrder(order))
 			this.newOrder(order);
 	}
