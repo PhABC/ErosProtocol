@@ -9,7 +9,7 @@
   "scripts": {
     "start": "gulp && webpack && gulp server",
     "build": "gulp build --production",
-    "build2": "babel --presets es2017 --plugins transform-async-to-generator --plugins transform-es2015-modules-commonjs --plugins babel-plugin-transform-object-rest-spread backend --out-dir build",
+    "build2": "babel --presets es2017 --plugins transform-async-to-generator --plugins transform-es2015-modules-commonjs --plugins babel-plugin-transform-object-rest-spread backend --out-dir build && cp erosContracts/build/contracts/ErosDiscoveryProtocol.json build",
     "matcher": "node build/Matcher.js",
     "whisper": "geth --dev --ws --wsport 8546 --wsorigins=“*” --shh",
     "testrpc": "testrpc --networkId 50 -p 8545 --db ./0x_testrpc_snapshot -m \"concert load couple harbor equip island argue ramp clarify fence smart topic\""
@@ -63,6 +63,7 @@
   "private": true,
   "dependencies": {
     "0x.js": "^0.21.4",
+    "abi-decoder": "^1.0.9",
     "babel": "^6.23.0",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-polyfill": "^6.26.0",

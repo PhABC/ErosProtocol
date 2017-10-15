@@ -43,7 +43,7 @@ const setup2 = () => {
 
 const initListeners = () => {
 	shh.subscribe('messages', {
-	    topics: [activeModules[0]],
+		topics: [activeModules[0]],
 			symKeyId: data.symKeyId
 	}, (err, obj) => {
 		if (err) throw new Error(err);

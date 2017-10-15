@@ -4,85 +4,74 @@ const ZeroEx = require('0x.js').ZeroEx;
 
 const NULL_ADDRESS = "0x0000000000000000000000000000000000000000";
 
-export function orderFromPayload(payload) {
-	console.log(payload);
+export let orderFromPayload = (payload) => {
 	return new Order(
-		payload.address,
-		payload.marketContractAddress,
-		payload.offeredTokenAddress,
-		payload.requestedTokenAddress,
+		payload.maker,
+		payload.taker,
+		payload.feeRecipient,
+		payload.makerTokenAddress,
+		payload.takerTokenAddress,
+		payload.exchangeContractAddress,
 		new BigNumber(payload.salt),
-		new BigNumber(payload.offeredTokenAmount),
-		new BigNumber(payload.price),
-		new BigNumber(payload.minRequestedTokenAmount),
-		new BigNumber(payload.maxRequestedTokenAmount),
-		new BigNumber(payload.expiryTime),
-		new BigNumber(payload.matcherFee)
+		new BigNumber(payload.makerFee),
+		new BigNumber(payload.takerFee),
+		new BigNumber(payload.makerTokenAmount),
+		new BigNumber(payload.takerTokenAmount),
+		new BigNumber(payload.expirationUnixTimestampSec),
+		payload.ecSignature
 	);
 }
 
 export class Order {
-	constructor(address, // maker address
-			marketContractAddress, // market contract address
-			offeredTokenAddress, // offer token contract address
-			requestedTokenAddress, // request token contract address
-			salt, // pseudo-random 256-bit number, as a BigNumber
-			offeredTokenAmount, // amount of token being offered, as a BigNumber
-			price, // amount of request token per order token, as a BigNumber
-			minRequestedTokenAmount, // minimum amount of request token that may be taken per order, as a BigNumber
-			maxRequestedTokenAmount, // maximum amount of request token that may be taken per order, as a BigNumber
-			expiryTime, // UNIX timestamp, seconds, as a BigNumber
-			matcherFee) { // in ETH, as a BigNumber
-		this.address = address;
-		this.marketContractAddress = marketContractAddress;
-		this.offeredTokenAddress = offeredTokenAddress;
-		this.requestedTokenAddress = requestedTokenAddress;
+	constructor(maker,
+			taker,
+			feeRecipient,
+			makerTokenAddress,
+			takerTokenAddress,
+			exchangeContractAddress,
+			salt,
+			makerFee,
+			takerFee,
+			makerTokenAmount,
+			takerTokenAmount,
+			expirationUnixTimestampSec,
+			ecSignature) {
+		this.maker = maker;
+		this.taker = taker;
+		this.feeRecipient = feeRecipient;
+		this.makerTokenAddress = makerTokenAddress;
+		this.takerTokenAddress = takerTokenAddress;
+		this.exchangeContractAddress = exchangeContractAddress;
 		this.salt = salt;
-		this.offeredTokenAmount = offeredTokenAmount;
-		this.price = price;
-		this.minRequestedTokenAmount = minRequestedTokenAmount;
-		this.maxRequestedTokenAmount = maxRequestedTokenAmount;
-		this.expiryTime = expiryTime;
-		this.matcherFee = matcherFee;
+		this.makerFee = makerFee;
+		this.takerFee = takerFee;
+		this.makerTokenAmount = makerTokenAmount;
+		this.takerTokenAmount = takerTokenAmount;
+		this.expirationUnixTimestampSec = expirationUnixTimestampSec;
+		this.ecSignature = ecSignature;
 	}
 
 	toPayload() {
 		return {
-			address: this.address,
-			marketContractAddress: this.marketContractAddress,
-			offeredTokenAddress: this.offeredTokenAddress,
-			requestedTokenAddress: this.requestedTokenAddress,
+			maker: this.maker,
+			taker: this.taker,
+			feeRecipient: this.feeRecipient,
+			makerTokenAddress: this.makerTokenAddress,
+			takerTokenAddress: this.takerTokenAddress,
+			exchangeContractAddress: this.exchangeContractAddress,
 			salt: this.salt.toString(),
-			offeredTokenAmount: this.offeredTokenAmount.toString(),
-			price: this.price.toString(),
-			minRequestedTokenAmount: this.minRequestedTokenAmount.toString(),
-			maxRequestedTokenAmount: this.maxRequestedTokenAmount.toString(),
-			expiryTime: this.expiryTime.toString(),
-			matcherFee: this.matcherFee.toString()
+			makerFee: this.makerFee.toString(),
+			takerFee: this.takerFee.toString(),
+			makerTokenAmount: this.makerTokenAmount.toString(),
+			takerTokenAmount: this.takerTokenAmount.toString(),
+			expirationUnixTimestampSec: this.expirationUnixTimestampSec.toString(),
+			ecSignature: this.ecSignature
 		};
 	}
 
 	// Get a unique per-order identifier
 	get id() {
 		return hash(this.toPayload());
-	}
-
-	// Get the 0x order object, with this order as the offerer
-	toZeroExOrder(offeredTokenAmount, offeredTokenDecimals, requestedTokenAddress) {
-		return {
-			maker: this.address,
-			taker: NULL_ADDRESS,
-			feeRecipient: NULL_ADDRESS,
-			makerTokenAddress: this.offeredTokenAddress,
-			takerTokenAddress: this.requestedTokenAddress,
-			exchangeContractAddress: this.marketContractAddress,
-			salt: this.salt,
-			makerFee: new BigNumber(0),
-			takerFee: new BigNumber(0),
-			makerTokenAmount: ZeroEx.toBaseUnitAmount(offeredTokenAmount, offeredTokenDecimals),
-			takerTokenAmount: ZeroEx.toBaseUnitAmount(new BigNumber(offeredTokenAmount * this.price), requestedTokenAddress).round(),
-			expirationUnixTimestampSec: new BigNumber(Date.now() + 3600000)
-		};
 	}
 }
 
@@ -116,7 +105,7 @@ export class OrderPool {
 
 	prune() {
 		this.pool = this.pool.filter((element, index, array) => {
-			return element.expiryTime > Date.now();
+			return element.expirationUnixTimestampSec > Date.now();
 		});
 	}
 
@@ -127,29 +116,23 @@ export class OrderPool {
 		this.pool.forEach((o) => {
 			if (o.id == order.id)
 				return;
-			if (o.marketContractAddress != order.marketContractAddress)
+			if (o.exchangeContractAddress != order.exchangeContractAddress)
 				return;
-			if (o.offeredTokenAddress != order.requestedTokenAddress)
+			if (o.makerTokenAddress != order.takerTokenAddress)
 				return;
-			if (o.requestedTokenAddress != order.offeredTokenAddress)
+			if (o.takerTokenAddress != order.makerTokenAddress)
 				return;
-			if (o.offeredTokenAmount == 0 || order.offeredTokenAmount == 0)
+			if (o.makerTokenAmount == 0 || o.takerTokenAmount == 0)
 				return;
-			if (o.price > (new BigNumber(1) / order.price))
+			if (order.makerTokenAmount == 0 || order.takerTokenAmount == 0)
 				return;
-			let offeredAmount = BigNumber.min(o.offeredTokenAmount, new BigNumber(order.offeredTokenAmount * order.price));
-			let requestedAmount = BigNumber.min(new BigNumber(o.offeredTokenAmount * o.price), order.offeredTokenAmount);
-			if (requestedAmount < o.minRequestedTokenAmount || requestedAmount > o.maxRequestedTokenAmount)
-				return;
-			if (offeredAmount < order.minRequestedTokenAmount || offeredAmount > order.maxRequestedTokenAmount)
+			if (o.takerTokenAmount / o.makerTokenAmount <= order.makerTokenAmount / order.takerTokenAmount)
 				return;
 			matches.push({
-				makerOrder: order,
-				takerOrder: o,
-				makerOfferedAmount: requestedAmount,
-				takerOfferedAmount: offeredAmount,
-				priority: [o.matcherFee + order.matcherFee, BigNumber.min(o.expiryTime, order.expiryTime),
-						Math.abs(o.price - order.price), offeredAmount],
+				orderA: order,
+				orderB: o,
+				priority: [o.makerFee + o.takerFee + order.makerFee + order.takerFee,
+						BigNumber.min(o.expirationUnixTimestampSec, order.expirationUnixTimestampSec)],
 			});
 		});
 
@@ -164,10 +147,8 @@ export class OrderPool {
 		} else {
 			let bestMatch = matches[matches.length - 1];
 			return {
-				makerOrder: bestMatch.makerOrder,
-				takerOrder: bestMatch.takerOrder,
-				makerOfferedAmount: bestMatch.makerOfferedAmount,
-				takerOfferedAmount: bestMatch.takerOfferedAmount
+				orderA: bestMatch.orderA,
+				orderB: bestMatch.orderB,
 			};
 		}
 	}
